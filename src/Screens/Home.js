@@ -6,6 +6,7 @@ import Foods from '../Components/Foods'
 import How from '../Components/How'
 import Testimonial from '../Components/Testimonial'
 import Footer from '../Components/Footer'
+import Vendors from "../Components/Vendors";
 
 const Home = () => {
   const { pathname } = useLocation();
@@ -36,7 +37,8 @@ const Home = () => {
         <button>Recommended</button>
       </div>
 
-      <Foods/>
+      {/* <Foods/> */}
+      <Vendors/>
       <How/>
       <Testimonial/>
       <Footer/>

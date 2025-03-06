@@ -6,6 +6,10 @@ import { FiMinus } from "react-icons/fi";
 import Wanted from '../Components/Wanted';
 import Footer from '../Components/Footer';
 import { useCart } from "../CartContext";
+import { IoIosArrowBack } from "react-icons/io";
+import { FiSearch } from "react-icons/fi";
+import { IoCartOutline } from "react-icons/io5";
+import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
 const Cart = () => {
 
@@ -38,7 +42,31 @@ const Cart = () => {
 
     return (
         <div>
-            <Header />
+            <div className="search-header header2">
+                        <div className="shc">
+                            <h4>
+                                <Link to='/'><IoIosArrowBack className="s-ii"/></Link>
+                                Cart
+                            </h4>
+
+                            <div className="s-cart">
+                                <FiSearch className="sc-i"/>
+                                <Link to='/cart' style={{color:'#fff'}}>
+                                    <IoCartOutline className="sc-i"/>
+                                    <span className="cart-count">{cart.length}</span> {/* Now correctly displays number of items */}
+                                </Link>
+                                
+
+                            </div>
+                        {/* <div className="search">
+                            
+                            <CiSearch className='sh-i'/>
+                            <input type="search" placeholder='Search' />
+                        </div>
+                        <button>Search</button> */}
+                        </div>
+                        
+                    </div>
 
             <div className="carts">
                 <div className="cart-l">
@@ -102,7 +130,6 @@ const Cart = () => {
             </div>
 
             <Wanted />
-            <Footer />
         </div>
     );
 };

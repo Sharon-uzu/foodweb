@@ -44,13 +44,13 @@ const Header = () => {
 
                     </ul>
 
-                    <div className="search-header">
+                    {/* <div className="search-header">
                         <div className="search">
                             <CiSearch className='sh-i'/>
                             <input type="search" placeholder='Search' />
                         </div>
                         <button>Search</button>
-                    </div>
+                    </div> */}
 
                     {/* Fixed Menu */}
                     <div className="fixed-menu">
@@ -59,11 +59,6 @@ const Header = () => {
                                 <Link to='/' className={`h-group ${location.pathname === '/' ? 'active' : ''}`}>
                                     <HiOutlineHome className='h-i'/>
                                     <span>Home</span>
-                                </Link>
-
-                                <Link to='/help' className={`h-group ${location.pathname === '/help' ? 'active' : ''}`}>
-                                    <IoIosHelpCircleOutline className='h-i'/>
-                                    <span>Help</span>
                                 </Link>
 
 

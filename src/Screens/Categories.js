@@ -1,6 +1,6 @@
 import React, {useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";import Header from '../Components/Header';
-import { IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowForward, IoIosSquareOutline } from "react-icons/io";
 import f1 from "../Assets/Food Photo (1).png";
 import f2 from "../Assets/Food Photo (2).png";
 import f3 from "../Assets/Food Photo (3).png";
@@ -14,12 +14,13 @@ import f10 from "../Assets/Food Photo (3).png";
 import f11 from "../Assets/Food Photo (4).png";
 import f12 from "../Assets/Food Photo (5).png";
 import { IoMdStar } from "react-icons/io";
-import Footer from '../Components/Footer';
-import { MdOutlineKeyboardArrowDown } from "react-icons/md";
-import { IoIosSquareOutline } from "react-icons/io";
-import { BiMenuAltLeft } from "react-icons/bi";
-import { RiCloseFill } from "react-icons/ri";
 import { useCart } from "../CartContext";
+import { CiSearch } from "react-icons/ci";
+import { IoIosArrowBack } from "react-icons/io";
+import { FiSearch } from "react-icons/fi";
+import { IoCartOutline } from "react-icons/io5";
+import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+
 
 const foodsList = [
     { id: 1, name: "Pizza", image: f1, price: 3500, category:'Savory Snacks' },
@@ -40,7 +41,8 @@ const categoryList = ["All", "Swallow", "Dessert Food", "Food", "Savory Snacks",
 const sortOptions = ["Popularity", "Newest Arrivals", "Product Ratings"];
 
 const Categories = () => {
-
+    const location = useLocation(); 
+    const { cart } = useCart();
     const { pathname } = useLocation();
 
     useEffect(() => {
@@ -99,7 +101,32 @@ const Categories = () => {
 
     return (
         <div>
-            <Header />
+            {/* <Header /> */}
+                    <div className="search-header header2">
+                        <div className="shc">
+                            <h4>
+                                <Link to='/'><IoIosArrowBack className="s-ii"/></Link>
+                                Genesis
+                            </h4>
+
+                            <div className="s-cart">
+                                <FiSearch className="sc-i"/>
+                                <Link to='/cart' className={`h-group ${location.pathname === '/cart' ? 'active' : ''}`} style={{color:'#fff'}}>
+                                    <IoCartOutline className="sc-i"/>
+                                    <span className="cart-count">{cart.length}</span> {/* Now correctly displays number of items */}
+                                </Link>
+                                
+
+                            </div>
+                        {/* <div className="search">
+                            
+                            <CiSearch className='sh-i'/>
+                            <input type="search" placeholder='Search' />
+                        </div>
+                        <button>Search</button> */}
+                        </div>
+                        
+                    </div>
 
             <div className="menu">
                 <div className="menu-c">
@@ -119,9 +146,9 @@ const Categories = () => {
                 </div>
             </div>
 
-            <div className='cat-menu' onClick={handleClick}>
+            {/* <div className='cat-menu' onClick={handleClick}>
                     {click ? (<RiCloseFill id='close' />) : (<BiMenuAltLeft id='bar' />)}
-            </div>
+            </div> */}
 
             <div className="main-category">
                 <div className={click ? 'cat-sidebar active' : 'cat-sidebar'}>
@@ -138,7 +165,6 @@ const Categories = () => {
                                     color: activeCategory === category ? "#fff" : "#000",
                                     padding: "10px",
                                     borderRadius: "5px",
-                                    marginBottom: "5px"
                                 }}
                             >
                                 <div className="list-c" onClick={closeMenuBar}>
@@ -152,6 +178,7 @@ const Categories = () => {
 
                 <div className="foods">
                     <div className="foods-c">
+                        
                         <h2>Our Menu</h2>
                         {filteredFoods.length === 0 ? (
                             <p>No items available for this category.</p>
@@ -187,7 +214,6 @@ const Categories = () => {
                 </div>
             </div>
 
-            <Footer />
         </div>
     );
 };
