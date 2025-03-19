@@ -11,29 +11,41 @@ import { FaRegBell } from "react-icons/fa6";
 import { CiGlobe } from "react-icons/ci";
 import { IoIosHelpCircleOutline } from "react-icons/io";
 import { IoIosLogOut } from "react-icons/io";
+import { Supabase } from "../../config/supabase-config";
+import defaultDp from '../../Assets/Admin photo.png';
 
-const AdminHeader = () => {
+
+const AdminHeader = ({ userDetails, profileImage, signOut }) => {  
   const [isOpen, setIsOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
   const profileRef = useRef(null);
+
 
   // Toggle dropdown
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
+  const toggleAccountDropdown = () => {
+    setIsAccountOpen(!isAccountOpen);
+    setIsOpen(true);
+  };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
+  // Close dropdown when clicking outside
+  useEffect(() => {  
+    const handleClickOutside = (event) => {  
+        if (profileRef.current && !profileRef.current.contains(event.target)) {  
+            setIsOpen(false);  
+            setIsAccountOpen(false);  
+        }  
+    };  
+
+    document.addEventListener('click', handleClickOutside);  
+    return () => {  
+        document.removeEventListener('click', handleClickOutside);  
+    };  
+}, []);  
+
 
   return (
     <header className='adminheader'>
@@ -41,7 +53,7 @@ const AdminHeader = () => {
         <Link to='/'><img src={logo} alt="Logo" /></Link>
 
         <ul>
-          <h4>Dashboard</h4>
+          {/* <h4>Dashboard</h4> */}
           <form>
             <div className="inp">
               <CiSearch className='f-i'/>
@@ -56,9 +68,18 @@ const AdminHeader = () => {
 
           {/* Profile Section */}
           <div className='h-group profile' ref={profileRef} onClick={toggleDropdown}>
-            <img src={dp} alt="Profile" />
-            <div>
-              <h5>Adam Smith</h5>
+          {/* <img src={userDetails?.image || defaultDp} alt="Admin Profile" className="profile-image" />   */}
+          {userDetails?.business ? (
+            <div className="profile-initial">
+              {userDetails.business.charAt(0).toUpperCase()}
+            </div>
+          ) : (
+            <img src={defaultDp} alt="Admin Profile" className="profile-image" />
+          )}
+
+
+          <div>
+            <h5>{userDetails ? userDetails.business : "User"}</h5> 
               <p>Admin</p>
             </div>
             {isOpen ? <IoIosArrowUp className='h-i'/> : <IoIosArrowDown className='h-i'/>}
@@ -67,13 +88,13 @@ const AdminHeader = () => {
           {isOpen && (
             <div className="profile-dropdown">
              
-                <Link to="/profile">
+                <Link onClick={toggleAccountDropdown}>
                     <div className="prof">
                         <div>
                             <CiUser className='d-i'/>
                             <h5>Account</h5>
                         </div>
-                        <MdKeyboardArrowRight className='d-i'/>
+                        {isOpen ? <MdKeyboardArrowRight className='d-i'/> : <IoIosArrowDown className='d-i'/>}
                     </div>
                     
                 </Link>
@@ -120,6 +141,20 @@ const AdminHeader = () => {
                     </div>
                     
                 </Link>
+                
+            </div>
+          )}
+
+
+          {isAccountOpen && (
+            <div className="profile-dropdown acct-dropdown">
+             
+              <h3>{userDetails ? userDetails.business : "User"}</h3>
+              <h3>{userDetails ? userDetails.email : "User"}</h3>
+              <Link to='/signin'><button>Login another account</button></Link>
+              <div><button className='btn2' onClick={toggleAccountDropdown}>Close</button></div>
+              <Link style={{color:'#FF7700'}} to='/signin'>LogOut</Link>
+
                 
             </div>
           )}

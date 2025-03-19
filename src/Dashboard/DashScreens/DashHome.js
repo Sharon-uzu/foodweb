@@ -2,27 +2,25 @@ import React from 'react'
 import Footer from '../../Components/Footer'
 import AdminHeader from '../DashComponents/AdminHeader'
 import CategoryImages from '../../Components/CategoryImages'
-import { NavLink } from 'react-router-dom'
-import { FaCube } from "react-icons/fa";
-import { MdOutlineNoFood } from "react-icons/md";
-import { LuLayoutDashboard } from "react-icons/lu";
-import { FaTableList } from "react-icons/fa6";
-import { AiOutlineFileDone } from "react-icons/ai";
-import { TbReport } from "react-icons/tb";
-import { IoIosHelpCircleOutline } from "react-icons/io";
-import { IoSettingsOutline } from "react-icons/io5";
-import { FiUsers } from "react-icons/fi";
-import { IoIosLogOut } from "react-icons/io";
+import { MdOutlineSendToMobile } from "react-icons/md";
+
+import Sidebar from '../DashComponents/Sidebar'
+import { TbCheckupList, TbTruckDelivery } from 'react-icons/tb';
+import { HiOutlineUsers } from 'react-icons/hi';
+import Graph from '../DashComponents/Graph';
+import History from '../DashComponents/History';
+import { Link } from 'react-router-dom';
 
 
-const DashHome = () => {
+const DashHome = ({ userDetails, profileImage }) => {
   return (
     <div>
-            <AdminHeader />
+            <AdminHeader userDetails={userDetails} profileImage={profileImage} />
+     
 
-            <div className="menu">
+            {/* <div className="menu">
                 <CategoryImages/>
-            </div>
+            </div> */}
 
             <div className='cat-menu' 
             // onClick={handleClick}
@@ -30,133 +28,75 @@ const DashHome = () => {
                     {/* {click ? (<RiCloseFill id='close' />) : (<BiMenuAltLeft id='bar' />)} */}
             </div>
 
-            <div className="main-category">
-                <div className='cat-sidebar'
-                // className={click ? 'cat-sidebar active' : 'cat-sidebar'}
-                >
-                    <div className="category-sidebar dash-sidebar">
+            <div className="main">
+                <Sidebar/>
 
-                        <NavLink to='/admin' className='links' activeclassName = 'active'>
-                    
-                            <div className='link'>
-                                <div>
-                            
-                                    <LuLayoutDashboard className='icon'/>
-                                    <h4>Dashboard</h4>
+                <div className="main-right">
+                    <div className="dash-home">
+                        <div className="dh-c">
+                            <h2>Today’s Sales</h2>
+                            <h3>Sales Analytics</h3>
+
+                            <div className="dh-cards">
+                                <div className="dh-card">
+                                    <div className="dh-card-c">
+                                        <MdOutlineSendToMobile className='d-icon'/>
+                                        <p>Total Sales</p>
+                                        <h5>$4K</h5>
+                                        <p>+8% from yesterday</p>
+                                    </div>
                                 </div>
 
-                            </div>
-                        
-                        </NavLink>
-
-                        <NavLink to='/admin' className='links' activeclassName = 'active'>
-                    
-                            <div className='link'>
-                                <div>
-                            
-                                    <MdOutlineNoFood className='icon'/>
-                                    <h4>Meals</h4>
+                                <div className="dh-card">
+                                    <div className="dh-card-c">
+                                        <TbCheckupList className='d-icon'/>
+                                        <p>Total Order</p>
+                                        <h5>$4.1K</h5>
+                                        <p>+8% from yesterday</p>
+                                    </div>
                                 </div>
-                            </div>
-                        
-                        </NavLink>
 
-                        <NavLink to='/admin' className='links' activeclassName = 'active'>
-                    
-                            <div className='link'>
-                                <div>
-                            
-                                    <FaTableList className='icon'/>
-                                    <h4>Tables</h4>
+                                <div className="dh-card">
+                                    <div className="dh-card-c">
+                                        <TbTruckDelivery className='d-icon'/>
+                                        <p>Total Delivery</p>
+                                        <h5>$3.7K</h5>
+                                        <p>+8% from yesterday</p>
+                                    </div>
                                 </div>
-                            </div>
-                        
-                        </NavLink>
 
-                        <NavLink to='/admin' className='links' activeclassName = 'active'>
-                    
-                            <div className='link'>
-                                <div>
-                            
-                                    <AiOutlineFileDone className='icon'/>
-                                    <h4>Orders</h4>
+                                <div className="dh-card">
+                                    <div className="dh-card-c">
+                                        <HiOutlineUsers className='d-icon'/>
+                                        <p>Total Customers</p>
+                                        <h5>$7K</h5>
+                                        <p>+8% from yesterday</p>
+                                    </div>
                                 </div>
-                            </div>
-                        
-                        </NavLink>
 
-                        <NavLink to='/admin' className='links' activeclassName = 'active'>
-                    
-                            <div className='link'>
-                                <div>
+                                
+                            </div>
+
                             
-                                    <TbReport className='icon'/>
-                                    <h4>Sales Report</h4>
-                                </div>
-                            </div>
-                        
-                        </NavLink>
-
-                        <NavLink to='/admin' className='links' activeclassName = 'active'>
-                    
-                            <div className='link'>
-                                <div>
                             
-                                    <IoIosHelpCircleOutline className='icon'/>
-                                    <h4>Help</h4>
-                                </div>
-                            </div>
-                        
-                        </NavLink>
+                        </div>
 
-                        <NavLink to='/admin' className='links' activeclassName = 'active'>
-                    
-                            <div className='link'>
-                                <div>
-                            
-                                    <IoSettingsOutline className='icon'/>
-                                    <h4>Setting</h4>
-                                </div>
-                            </div>
-                        
-                        </NavLink>
-
-                        <NavLink to='/admin' className='links' activeclassName = 'active'>
-                    
-                            <div className='link'>
-                                <div>
-                            
-                                    <FiUsers className='icon'/>
-                                    <h4>Users</h4>
-                                </div>
-                            </div>
-                        
-                        </NavLink>
-
-          
-
-                        
-                        <NavLink to='/admin' className='links' activeclassName = 'active'>
-                    
-                            <div className='link'>
-                                <div>
-                            
-                                    <IoIosLogOut className='icon'/>
-                                    <h4>LogOut</h4>
-                                </div>
-                            </div>
-                        
-                        </NavLink>
                         
                     </div>
+
+                    <div className='chart' >
+                        <h3>Customer's Satisfaction</h3>
+
+                        <Graph/>
+                    </div>
+
+                    <div className="history-table">
+                        <History/>
+                    </div>
+
                 </div>
 
-                <div className="foods">
-                    <div className="foods-c">
-                        <h2>Our Menu</h2>
-                        
-                    </div>
-                </div>
+
             </div>
 
             <Footer />
