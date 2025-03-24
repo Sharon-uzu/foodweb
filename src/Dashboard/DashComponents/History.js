@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
 const data = [
-  { id: 1, customer: "John Doe", items: [{ name: "Laptop", price: 1000 }, { name: "Mouse", price: 50 }], number: "ORD12345", date: "2025-03-01", time: "10:30 AM", status: "Pending" },
-  { id: 2, customer: "Jane Smith", items: [{ name: "Phone", price: 800 }, { name: "Charger", price: 20 }], number: "ORD12346", date: "2025-03-02", time: "12:45 PM", status: "Delivered" },
-  { id: 3, customer: "Alice Johnson", items: [{ name: "Headphones", price: 200 }], number: "ORD12347", date: "2025-03-03", time: "2:15 PM", status: "Pending" },
-  { id: 4, customer: "Bob Brown", items: [{ name: "Keyboard", price: 150 }, { name: "Monitor", price: 300 }], number: "ORD12348", date: "2025-03-04", time: "4:00 PM", status: "Delivered" },
+  { id: 1, order: 10, items: [{ name: "Laptop", price: 1000 }, { name: "Mouse", price: 50 }], number: "ORD12345", date: "2025-03-01", time: "10:30 AM", status: "Pending" },
+  { id: 2, order: 10, items: [{ name: "Phone", price: 800 }, { name: "Charger", price: 20 }], number: "ORD12346", date: "2025-03-02", time: "12:45 PM", status: "Delivered" },
+  { id: 3, order: 10, items: [{ name: "Headphones", price: 200 }], number: "ORD12347", date: "2025-03-03", time: "2:15 PM", status: "Pending" },
+  { id: 4, order: 10, items: [{ name: "Keyboard", price: 150 }, { name: "Monitor", price: 300 }], number: "ORD12348", date: "2025-03-04", time: "4:00 PM", status: "Delivered" },
 ];
 
 const History = () => {
@@ -25,7 +25,7 @@ const History = () => {
         <table className="styled-table">
           <thead>
             <tr>
-              <th>Customer</th>
+              <th>Order No.</th>
               <th>Items</th>
               <th>Number</th>
               <th>Date</th>
@@ -37,7 +37,7 @@ const History = () => {
           <tbody>
             {data.map((item) => (
               <tr key={item.number}>
-                <td>{item.customer}</td>
+                <td>{item.order}</td>
                 <td>{item.items.map(i => i.name).join(", ")}</td>
                 <td>{item.number}</td>
                 <td>{item.date}</td>
@@ -59,8 +59,8 @@ const History = () => {
         <div className="table-overlay">
           <div className="t-modal-content">
             <h2>Order Details</h2>
-            <p><strong>Customer:</strong> {selectedOrder.customer}</p>
-            <p><strong>Order Number:</strong> {selectedOrder.number}</p>
+            <p><strong>Order No.:</strong> {selectedOrder.order}</p>
+            <p><strong>Table Number:</strong> {selectedOrder.number}</p>
             <p><strong>Date:</strong> {selectedOrder.date}</p>
             <p><strong>Time:</strong> {selectedOrder.time}</p>
             <p><strong>Status:</strong> <span className={`status ${selectedOrder.status.toLowerCase()}`}>{selectedOrder.status}</span></p>

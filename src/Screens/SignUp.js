@@ -151,7 +151,7 @@ const SignUp = () => {
                         
                         <button onClick={handleSubmit} disabled={isLoading}>{isLoading ? "Loading..." : "Create Account"}</button>  
 
-                        <p className='else'>Have an account already? <Link to='/signin'>Login</Link></p>  
+                        <p className='else'>Have an account already? <Link to='/'>Login</Link></p>  
                     </div>  
                     <img src={img} alt="Signup" className='f-img'/>  
                 </div>  

@@ -2358,6 +2358,17 @@ header nav ul .h-group{
   cursor: pointer;
 }
 
+.modal-overlay .cart-close-button {
+  background: #FF7700;
+  color: #fff;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  padding: 8px 15px;
+  border-radius: 5px;
+}
+
 .modal-overlay .modal-content .meal-inp{
   display: flex;
   gap: 10px;

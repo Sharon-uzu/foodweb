@@ -36,7 +36,7 @@ const Header = () => {
                         </Link>
 
 
-                        <Link to='/cart' className={`h-group ${location.pathname === '/cart' ? 'active' : ''}`}>
+                        <Link to='/cart?table=false' className={`h-group ${location.pathname === '/cart' ? 'active' : ''}`}>
                             <AiOutlineShoppingCart className='h-i'/>
                             <span>Cart</span>
                             <span className="cart-count">{cart.length}</span> {/* Now correctly displays number of items */}
@@ -62,7 +62,7 @@ const Header = () => {
                                 </Link>
 
 
-                                <Link to='/cart' className={`h-group ${location.pathname === '/cart' ? 'active' : ''}`}>
+                                <Link to='/cart?table=false' className={`h-group ${location.pathname === '/cart' ? 'active' : ''}`}>
                                     <AiOutlineShoppingCart className='h-i'/>
                                     <span>Cart</span>
                                     <span className="cart-count c-counts">{cart.length}</span> {/* Now correctly displays number of items */}

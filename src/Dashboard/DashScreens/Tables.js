@@ -104,8 +104,8 @@ const Tables = ({ userId }) => {
 
   // Generate QR Code
   const generateQRCode = (tableNumber) => {
-    // const qrValue = `${LiveBaseUrl}/categories?vendorId=${userId}&business=${businessName}&tableNumber=${tableNumber}`;
-    const qrValue = `${DevBaseUrl}/categories?vendorId=${userId}&business=${businessName}&tableNumber=${tableNumber}`;
+    const qrValue = `${LiveBaseUrl}/categories?vendorId=${userId}&business=${businessName}&tableNumber=${tableNumber}`;
+    // const qrValue = `${DevBaseUrl}/categories?vendorId=${userId}&business=${businessName}&tableNumber=${tableNumber}`;
    
     setQrData(qrValue);
     setShowQRModal(true);

@@ -136,7 +136,7 @@ const Categories = () => {
     };  
 
       const handleProceedToCart = () => {
-        navigate("/cart"); // Redirect to cart page
+        navigate('/cart?table=false'); // Redirect to cart page
       };
     
       const handleClearCart = () => {
