@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useCart } from '../CartContext'; import logo from '../Assets/logo.png';
+import { useCart } from '../CartContext'; 
+import logo from '../Assets/ScanOrder logo pdf.png';
 import { HiOutlineHome } from "react-icons/hi";
 import { IoIosHelpCircleOutline } from "react-icons/io";
 import { AiOutlineShoppingCart } from "react-icons/ai";

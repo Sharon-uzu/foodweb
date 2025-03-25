@@ -183,7 +183,7 @@ const fetchTableData = async (tableNumber) => {
             clearCart();
     
             setTimeout(() => {  
-                navigate('/');  
+                navigate('/ordersuccess');  
             }, 2000);   
         } catch (error) {  
             console.error('Error placing order:', error.message);  
