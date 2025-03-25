@@ -271,36 +271,47 @@ const Categories = () => {
                     {activeCategory === "All" ? "All Items" : activeCategory}
                     </h2>
 
-                    {filteredMeals.length > 0 ? (
-                    filteredMeals.map((meal) => {
-                        const isInCart = cart.some((item) => item.id === meal.id);
-                        return (
-                        <div
-                            style={{ cursor: "pointer" }}
-                            className="food"
-                            key={meal.id}
-                            onClick={() => handleAddToCart(meal)}
-                        >
-                            <div className="food-c">
-                            <img src={meal.image} alt={meal.name} />
-                            <h6>{meal.mealname}</h6>
-                            <h5>₦{Number(meal.mealprice).toFixed(2)}</h5>
+                    {filteredMeals.length > 0 ? (  
+                        filteredMeals.map((meal) => {  
+                            const isInCart = cart.some((item) => item.id === meal.id);  
+                            const isTableNumberValid = TableNumber && TableNumber !== "false"; // Check if TableNumber is valid  
 
-                                <button disabled={isInCart || buttonState[meal.id] === "adding"} style={{
-                                opacity: isInCart ? 0.3 : 1,
-                                transition: "opacity 0.3s",
-                                }}>
-                                    {buttonState[meal.id] === "adding" ? "Adding..." : isInCart ? "In Cart" : "Add to Cart"}
-                                </button>
-                            </div>
-                        </div>
-                        );
-                    })
-                    ) : (
-                    <p>No meals found for this category.</p>
-                    )}
+                            return (  
+                                <div  
+                                    style={{ cursor: "pointer" }}  
+                                    className="food"  
+                                    key={meal.id}  
+                                    onClick={() => handleAddToCart(meal)}  
+                                >  
+                                    <div className="food-c">  
+                                        <img src={meal.image} alt={meal.mealname} />  
+                                        <h6>{meal.mealname}</h6>  
+                                        <h5>₦{Number(meal.mealprice).toFixed(2)}</h5>  
+
+                                        {isTableNumberValid && (  
+                                            <button  
+                                                disabled={isInCart || buttonState[meal.id] === "adding"}  
+                                                style={{  
+                                                    opacity: isInCart ? 0.3 : 1,  
+                                                    transition: "opacity 0.3s",  
+                                                }}  
+                                            >  
+                                                {buttonState[meal.id] === "adding"  
+                                                    ? "Adding..."  
+                                                    : isInCart  
+                                                    ? "In Cart"  
+                                                    : "Add to Cart"}  
+                                            </button>  
+                                        )}  
+                                    </div>  
+                                </div>  
+                            );  
+                        })  
+                    ) : (  
+                        <p>No meals found for this category.</p>  
+                    )}  
                 </div>
-                </div>
+              </div>
             )}
       </div>
 

@@ -1840,6 +1840,7 @@ header nav ul .h-group{
     padding: 12px;
     border-bottom: 1px solid #ddd;
     text-align: left;
+    text-transform: capitalize;
     color: #000;
   }
   .main .history-table .styled-table th, .styled-table td button{
@@ -1996,7 +1997,20 @@ header nav ul .h-group{
   }
 
   .main .main-right .meals .meals-c .meals-top{
+    display: flex;
     justify-content: end;
+  }
+
+  .main .main-right .meals .meals-c .meals-top button{
+    background-color: #FF7700;
+    color: #fff;
+    font-weight: 400;
+    font-size: 15px;
+    padding: 8px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border: none;
+    cursor: pointer;
   }
 
 

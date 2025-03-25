@@ -24,9 +24,9 @@ const DashHome = ({ userDetails, profileImage }) => {
     const [orders, setOrders] = useState([]); // Store orders separately for History component
     const [selectedOrder, setSelectedOrder] = useState(null);
 
-    const openModal = (order) => {
-      setSelectedOrder(order);
-    };
+    const openModal = (order) => {  
+        setSelectedOrder(order);  
+    }; 
   
     const closeModal = () => {
       setSelectedOrder(null);
@@ -37,31 +37,41 @@ const DashHome = ({ userDetails, profileImage }) => {
         }
     }, [userDetails]);
 
-    const fetchOrdersData = async (adminId) => {
-        try {
-            const { data: ordersData, error } = await Supabase
-                .from('food-web-orders')
-                .select('*')
-                .eq('vendor', adminId); // Fetch only admin's orders
+    const fetchOrdersData = async (adminId) => {  
+        try {  
+            const { data: ordersData, error } = await Supabase  
+                .from('food-web-orders')  
+                .select('*, created_at, metadata->>tablenumber as tablenumber')  
+                .eq('vendor', adminId); // Ensure we're fetching only the logged-in user's orders  
     
-            if (error) throw error;
-
-            setOrders(ordersData); // Store orders for History
-
-            const totalSalesAmount = ordersData.reduce((acc, order) => 
-                acc + (parseFloat(order.totalprice) || 0), 0
-            );
-
-            const totalDeliveries = ordersData.filter(order => order.status?.toLowerCase() === 'delivered').length;
+            if (error) throw error;  
     
-            setTotalSales(totalSalesAmount);
-            setTotalOrders(ordersData.length);
-            setTotalDeliveries(totalDeliveries);
+            // Process orders data  
+            const processedOrders = ordersData.map(order => {  
+                const createdAt = new Date(order.created_at);  
+                return {  
+                    ...order,  
+                    date: createdAt.toLocaleDateString(), // Format date  
+                    time: createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), // Format time  
+                    items: JSON.parse(order.metadata) // Parse JSON string to get items  
+                };  
+            });  
     
-        } catch (err) {
-            console.error('Error fetching orders:', err.message);
-        }
-    };
+            setOrders(processedOrders); // Store processed orders for History  
+    
+            const totalSalesAmount = processedOrders.reduce((acc, order) =>   
+                acc + (parseFloat(order.totalprice) || 0), 0  
+            );  
+    
+            const totalDeliveries = processedOrders.filter(order => order.status?.toLowerCase() === 'delivered').length;  
+    
+            setTotalSales(totalSalesAmount);  
+            setTotalOrders(processedOrders.length);  
+            setTotalDeliveries(totalDeliveries);  
+        } catch (err) {  
+            console.error('Error fetching orders:', err.message);  
+        }  
+    };   
 
     return (
         <div>
@@ -121,7 +131,7 @@ const DashHome = ({ userDetails, profileImage }) => {
                         <Graph />
                     </div>
 
-                    {/* History Table */}
+                    {/* Order Table */}
                     <div className="history-table">
                     <div className="table-container">
                         <h2 className="table-title">Orders</h2>
@@ -138,55 +148,59 @@ const DashHome = ({ userDetails, profileImage }) => {
                                 <th></th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {orders.map((order) => (
-                                    <tr key={order.id}>
-                                    <td>{order.id}</td>
-                                    <td>{order.items ? order.items.map(i => i.name).join(", ") : "N/A"}</td>
-                                    <td>{order.tablenumber}</td>
-                                    <td>{order.date}</td>
-                                    <td>{order.time}</td>
-                                    <td className={`status ${order.status.toLowerCase()}`}>{order.status}</td>
-                                    <td>
-                                        <button className="action-btn" onClick={() => openModal(order)}>
-                                        View
-                                        </button>
-                                    </td>
-                                    </tr>
-                                ))}
-                                </tbody>
+                            <tbody>  
+                                {orders.map((order) => (  
+                                    <tr key={order.id}>  
+                                        <td>{order.id}</td>  
+                                        <td>  
+                                            {order.items ? order.items.map(item => (  
+                                                <div key={item.foodname}>  
+                                                    {item.foodname} (Qty: {item.quantity})  
+                                                </div>  
+                                            )) : "N/A"}  
+                                        </td>  
+                                        <td>{order.tablenumber}</td>
+                                        <td>{order.date}</td> 
+                                        <td>{order.time}</td>  
+                                        <td className={`status ${order.status.toLowerCase()}`}>{order.status}</td>  
+                                        <td>  
+                                            <button className="action-btn" onClick={() => openModal(order)}>View</button>  
+                                        </td>  
+                                    </tr>  
+                                ))}  
+                            </tbody>   
 
                             </table>
                         </div>
 
                         {/* Modal */}
-                        {selectedOrder && (
-                            <div className="table-overlay">
-                            <div className="t-modal-content">
-                                <h2>Order Details</h2>
-                                <p><strong>Order No.:</strong> {selectedOrder.order}</p>
-                                <p><strong>Table Number:</strong> {selectedOrder.number}</p>
-                                <p><strong>Date:</strong> {selectedOrder.date}</p>
-                                <p><strong>Time:</strong> {selectedOrder.time}</p>
-                                <p><strong>Status:</strong> <span className={`status ${selectedOrder.status.toLowerCase()}`}>{selectedOrder.status}</span></p>
+                        {selectedOrder && (  
+                            <div className="table-overlay">  
+                                <div className="t-modal-content">  
+                                    <h2>Order Details</h2>  
+                                    <p><strong>Order No.:</strong> {selectedOrder.id}</p> {/* Ensure correct order ID */}  
+                                    <p><strong>Table Number:</strong> {selectedOrder.tablenumber}</p> {/* Use tablenumber fetched from metadata */}  
+                                    <p><strong>Date:</strong> {selectedOrder.date}</p>  
+                                    <p><strong>Time:</strong> {selectedOrder.time}</p>  
+                                    <p><strong>Status:</strong> <span className={`status ${selectedOrder.status.toLowerCase()}`}>{selectedOrder.status}</span></p>  
 
-                                <h3>Items Ordered:</h3>
-                                <ul className="items-list">
-                                {selectedOrder.items.map((item, index) => (
-                                    <li key={index}>
-                                    {item.name} - <span className="price">${item.price.toFixed(2)}</span>
-                                    </li>
-                                ))}
-                                </ul>
+                                    <h3>Items Ordered:</h3>  
+                                    <ul className="items-list">  
+                                    {selectedOrder.items.map((item, index) => (  
+                                        <li key={index}>  
+                                            {item.foodname} - Quantity: {item.quantity},  Price: {item.foodprice} {/* Use foodprice and quantity to calculate total */}  
+                                        </li>  
+                                    ))}  
+                                    </ul>  
 
-                                <h3>Total Amount: <span className="total-price">
-                                ${selectedOrder.items.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
-                                </span></h3>
+                                    <h3>Total Amount: <span className="total-price">  
+                                    ${selectedOrder.items.reduce((sum, item) => sum + (item.foodprice * item.quantity), 0).toFixed(2)} {/* Calculate total based on foodprice and quantity */}  
+                                    </span></h3>  
 
-                                <button className="close-btn" onClick={closeModal}>Close</button>
-                            </div>
-                            </div>
-                        )}
+                                    <button className="close-btn" onClick={closeModal}>Close</button>  
+                                </div>  
+                            </div>  
+                        )}  
 
                         
                         </div>

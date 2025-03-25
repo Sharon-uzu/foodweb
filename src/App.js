@@ -102,10 +102,10 @@ function App() {
                         <>  
                             <Route path='/admin' element={<DashHome userDetails={userDetails} profileImage={profileImage} />} />  
                             <Route path='/meals' element={<Meals userId={userDetails?.id} />} />  
-                            <Route path='/orders' element={<Orders />} />  
-                            <Route path='/sales' element={<Sales />} />  
+                            <Route path='/orders' element={<Orders userDetails={userDetails} profileImage={profileImage}/>} />  
+                            <Route path='/sales' element={<Sales userId={userDetails?.id}/>} />  
                             <Route path='/table' element={<Tables userId={userDetails?.id}/>} />  
-                            <Route path='/users' element={<Users />} />  
+                            <Route path='/users' element={<Users userId={userDetails?.id}/>} />  
                         </>  
                     )}  
                 </Routes>  
