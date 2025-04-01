@@ -7,6 +7,7 @@ import How from '../Components/How'
 import Testimonial from '../Components/Testimonial'
 import Footer from '../Components/Footer'
 import Vendors from "../Components/Vendors";
+import Typewriter from 'typewriter-effect';
 
 const Home = () => {
   const { pathname } = useLocation();
@@ -22,14 +23,29 @@ const Home = () => {
         <Header/>
         <div className="hero">
           <div className="hero-c">
-            <h3><span>Fresh</span>, Locally Sourced Ingredients Make The <span>Difference</span></h3>
-            <p>We bring the love of food to your table with delicious recipes, expert tips, and mouthwatering inspiration</p>
+            {/* <h3><span>Fresh</span>, Locally Sourced Ingredients Make The <span>Difference</span></h3> */}
+            <h3>
+            <Typewriter
+            options={{
+              autoStart: true,
+              loop: true,
+              delay: 70,
+              strings: [
+                "Order in Seconds, Savor Every Moment",
+                "Your Table, Your Menu, Your Way",
+                "Scan, Order, and Get Served Seamlessly",
+                
+              ],
+            }}
+          />
+            </h3>
+            <p>No more waiting for menus or servers. With Scan Order, your dining experience starts the moment you sit down.</p>
             <a href='#recommend'><button>Get Started</button></a>
           </div>
         </div>
 
         <div className="category">
-          <h2>Our Category</h2>
+          <h2>Categories</h2>
           <CategoryImages/>
 
         </div>

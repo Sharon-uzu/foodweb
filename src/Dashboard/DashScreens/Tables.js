@@ -9,7 +9,7 @@ import img from "../../Assets/unsplash_eJ2NHoKZ1gY.png";
 import { Supabase } from "../../config/supabase-config";
 import { DevBaseUrl, LiveBaseUrl } from "../../utility";
 
-const Tables = ({ userId }) => {
+const Tables = ({ userId, userDetails }) => {
   const [showModal, setShowModal] = useState(false);
   const [tableName, setTableName] = useState("");
   const [tableNumber, setTableNumber] = useState("");
@@ -127,7 +127,7 @@ const Tables = ({ userId }) => {
 
   return (
     <div>
-      <AdminHeader />
+      <AdminHeader userDetails={userDetails}/>
       <div className="main">
         <Sidebar />
         <div className="main-right">

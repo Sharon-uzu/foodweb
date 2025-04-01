@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { HiOutlineHome } from "react-icons/hi";
 import { CiSearch } from "react-icons/ci";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import logo from '../../Assets/logo.png';
+import logo from '../../Assets/ScanOrder logo pdf.png';
 import dp from '../../Assets/Admin photo.png';
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { CiUser } from "react-icons/ci";

@@ -75,7 +75,7 @@ header nav{
 }
 
 header nav img{
-  width: 80px;
+  width: 55px;
   height: 50px;
 }
 
@@ -244,11 +244,10 @@ header nav ul .h-group{
 }
 
 .hero .hero-c h3{
-  font-weight: 400;
-  font-size: 44px;
-  letter-spacing: .4px;
+  font-weight: 600;
+  font-size: 46px;
   color: #fff;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 .hero .hero-c h3 span{
@@ -289,10 +288,35 @@ header nav ul .h-group{
   justify-content: center;
   align-items: center;
 }
-
-.slide img {
+.s-i{
   width: 95%;
   height: 200px;
+  position: relative;
+  border-radius: 10px;
+  /* z-index: 1; */
+}
+.s-i .covering{
+  width: 100%;
+  /* z-index: 2; */
+  height: 100%;
+  background-color: hsla(0, 0%, 0%,.5);
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  border-radius: 10px;
+}
+.s-i .covering h4{
+  font-weight: 400;
+  font-size: 23px;
+  color: #fff;
+  text-align: center;
+}
+.slide img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   border-radius: 10px;
   transition: transform 0.4s ease-in-out, opacity 0.3s;
@@ -402,7 +426,22 @@ header nav ul .h-group{
   width: 90%;
   margin: auto;
 }
-
+.foods-c .food .food-c .h-icon{
+  width: 120px;
+  height: 120px;
+  margin: auto;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8d4b7;
+  margin: auto;
+  margin-bottom: 15px;
+}
+.foods-c .food .food-c .h-icon .icc{
+  font-size: 40px;
+  color:#ec7533;
+}
 .foods-c .food .food-c img{
   width: 100%;
   height: 230px;
@@ -502,7 +541,7 @@ header nav ul .h-group{
  }
 
   .how .foods-c .food{
-    width: 32%;
+    width: 23%;
   }
   .how .foods-c .food .food-c{
     width: 95%;
@@ -630,9 +669,9 @@ header nav ul .h-group{
     
    }
    .footer footer .f-img img{
-    width: 100%;
-    height: 120px;
-    object-fit: cover;
+    width: 70px;
+    height: 70px;
+    /* object-fit: cover; */
    }
    .footer footer .foot1{
     width: 20%;
@@ -1327,6 +1366,10 @@ header nav ul .h-group{
   }
   .foods .foods-c .food{
     width: 32%;
+  }
+
+  .how .foods-c .food{
+    width: 24%;
   }
 
   /* sign up, sign in */
@@ -2548,8 +2591,9 @@ header nav ul .h-group{
       /* width: 78%; */
     }
     .foods .foods-c .food{
-      width: 32%;
+      width: 48%;
     }
+    
   }
 
   @media screen and (max-width:850px){

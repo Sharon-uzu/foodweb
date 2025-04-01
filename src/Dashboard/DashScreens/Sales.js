@@ -3,10 +3,10 @@ import AdminHeader from '../DashComponents/AdminHeader'
 import { Link } from 'react-router-dom'
 import SalesRevenueChart from '../DashComponents/SalesRevenueChart'
 
-const Sales = () => {
+const Sales = ({ userDetails}) => {
   return (
     <div>
-        <AdminHeader/>
+        <AdminHeader userDetails={userDetails}/>
         <div className="adminsales">
             <Link to='/admin'>
                 <button>Go back</button>

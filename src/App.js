@@ -103,11 +103,11 @@ function App() {
                     {loggedIn && (  
                         <>  
                             <Route path='/admin' element={<DashHome userDetails={userDetails} profileImage={profileImage} />} />  
-                            <Route path='/meals' element={<Meals userId={userDetails?.id} />} />  
+                            <Route path='/meals' element={<Meals userId={userDetails?.id} userDetails={userDetails} profileImage={profileImage}/>} />  
                             <Route path='/orders' element={<Orders userDetails={userDetails} profileImage={profileImage}/>} />  
-                            <Route path='/sales' element={<Sales userId={userDetails?.id}/>} />  
-                            <Route path='/table' element={<Tables userId={userDetails?.id}/>} />  
-                            <Route path='/users' element={<Users userId={userDetails?.id}/>} />  
+                            <Route path='/sales' element={<Sales userId={userDetails?.id} userDetails={userDetails} profileImage={profileImage}/>} />  
+                            <Route path='/table' element={<Tables userId={userDetails?.id} userDetails={userDetails} profileImage={profileImage}/>} />  
+                            <Route path='/users' element={<Users userId={userDetails?.id} userDetails={userDetails} profileImage={profileImage}/>} />  
                         </>  
                     )}  
                 </Routes>  

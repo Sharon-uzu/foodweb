@@ -31,10 +31,10 @@ const Header = () => {
                             <span>Home</span>
                         </Link>
 
-                        <Link to='/help' className={`h-group ${location.pathname === '/help' ? 'active' : ''}`}>
+                        <a href='#how' className={`h-group ${location.pathname === '/help' ? 'active' : ''}`}>
                             <IoIosHelpCircleOutline className='h-i'/>
-                            <span>Help</span>
-                        </Link>
+                            <span>How It Works</span>
+                        </a>
 
 
                         <Link to='/cart?table=false' className={`h-group ${location.pathname === '/cart' ? 'active' : ''}`}>

@@ -119,7 +119,7 @@ const Orders = ({ userDetails}) => {
 
     return (
         <div>
-            <AdminHeader />
+            <AdminHeader userDetails={userDetails}/>
             <div className="main">
                 <Sidebar />
                 <div className="main-right">

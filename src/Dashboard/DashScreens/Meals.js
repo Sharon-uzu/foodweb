@@ -10,7 +10,7 @@ import { Navigation } from 'swiper/modules';
 import 'swiper/css';  
 import 'swiper/css/navigation';  
   
-const Meals = ({ userId }) => {  
+const Meals = ({ userId, userDetails, profileImage }) => {  
     const [showModal, setShowModal] = useState(false);  
     const [showEditModal, setShowEditModal] = useState(false);  
     const [selectedImage, setSelectedImage] = useState(imgupload);  
@@ -188,7 +188,7 @@ const Meals = ({ userId }) => {
 
     return (  
         <div>  
-            <AdminHeader />  
+            <AdminHeader userDetails={userDetails} profileImage={profileImage}/>  
             <div className="main">  
                 <Sidebar />  
                 <div className="main-right">  

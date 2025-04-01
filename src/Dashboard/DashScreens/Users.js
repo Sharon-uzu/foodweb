@@ -10,10 +10,10 @@ const data = [
     { id: 3, name: "Alice Johnson", email: "alice@gmail.com", phone: "0912345678", address: "#2 Woji, PH"},
     { id: 4, name: "Bob Brown", email: "bob@gmail.com", phone: "0912345678", address: "#2 Woji, PH"},
   ];
-const Users = () => {
+const Users = ({ userDetails}) => {
   return (
         <div>
-            <AdminHeader />
+            <AdminHeader userDetails={userDetails}/>
 
             <div className="main">
                 <Sidebar/>

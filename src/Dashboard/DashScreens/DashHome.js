@@ -118,7 +118,7 @@ const DashHome = ({ userDetails, profileImage }) => {
                                     <div className="dh-card-c">
                                         <HiOutlineUsers className='d-icon' />
                                         <p>Total Customers</p>
-                                        <h5>0</h5>
+                                        <h5>20</h5>
                                         <p>+8% from yesterday</p>
                                     </div>
                                 </div>

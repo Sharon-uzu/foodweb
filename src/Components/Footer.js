@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { FaFacebookF } from "react-icons/fa";
 import { RiInstagramFill } from "react-icons/ri";
 import { BsTwitterX } from "react-icons/bs";
-import logo from '../Assets/f-logo.png'
+import logo from '../Assets/ScanOrder logo pdf.png'
 
 const Footer = () => {
   return (
@@ -26,11 +26,9 @@ const Footer = () => {
 
             <div className="foot1">
                 <h3>Navigation Links</h3>
-                <p><Link to="">Home</Link></p>
-                <p><Link to="">Menu</Link></p>
-                <p><Link to="">About</Link></p>
-                <p><Link to="">Contact</Link></p>
-                <p><Link to="">Online Ordering</Link></p>
+                <p><Link to="/">Home</Link></p>
+                <p><Link to="/categories">Menu</Link></p>
+                
             </div>
 
             <div className="foot1">
