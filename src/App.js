@@ -17,6 +17,7 @@ import Tables from './Dashboard/DashScreens/Tables';
 import Users from './Dashboard/DashScreens/Users';  
 import { Supabase } from './config/supabase-config';  
 import OrderSuccess from './Screens/OrderSuccess';
+import Pricing from './Screens/Pricing';
 
 function App() {  
     const navigate = useNavigate();  
@@ -95,6 +96,7 @@ function App() {
                     <Route path='/categories' element={<Categories />} />  
                     <Route path='/contact' element={<Contact />} />  
                     <Route path='/signup' element={<SignUp />} />
+                    <Route path='/pricing' element={<Pricing />} />
                     <Route path='/ordersuccess' element={<OrderSuccess />} />  
                     <Route path='/signin' element={<SignIn setLoggedIn={setLoggedIn} setUserDetails={setUserDetails} />} />  
                     <Route path='/passwordreset' element={<PasswordReset />} />  

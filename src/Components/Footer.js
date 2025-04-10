@@ -16,8 +16,8 @@ const Footer = () => {
 
             <div className="foot1 foot-c">
                 <h3>Contact Information</h3>
-                <p><a href="">Phone Number</a></p>
-                <p><a href="">Company Address</a></p>
+                <p><a href="tel:07034100741">07034100741</a></p>
+                <p><a href="mailto:hello@myscanorder.com">hello@myscanorder.com</a></p>
                 <div className="f-footer">
                     <input type="email" placeholder='Email' />
                     <button>Subscribe</button>

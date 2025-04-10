@@ -26,7 +26,7 @@ const Header = () => {
                             <button>Search</button>
                         </form>
 
-                        <Link to='/' className={`h-group ${location.pathname === '/' ? 'active' : ''}`}>
+                        <Link to='/' className={`h-group ${location.pathname === '/' ? 'active' : ''}`} id='hometext'>
                             <HiOutlineHome className='h-i'/>
                             <span>Home</span>
                         </Link>
@@ -41,6 +41,11 @@ const Header = () => {
                             <AiOutlineShoppingCart className='h-i'/>
                             <span>Cart</span>
                             <span className="cart-count">{cart.length}</span> {/* Now correctly displays number of items */}
+                        </Link>
+
+                        <Link to='/pricing' className={`h-group ${location.pathname === '/pricing' ? 'active' : ''}`}>
+                            {/* <HiOutlineHome className='h-i'/> */}
+                            <span>Pricing</span>
                         </Link>
 
                     </ul>
@@ -67,6 +72,11 @@ const Header = () => {
                                     <AiOutlineShoppingCart className='h-i'/>
                                     <span>Cart</span>
                                     <span className="cart-count c-counts">{cart.length}</span> {/* Now correctly displays number of items */}
+                                </Link>
+
+                                <Link to='/pricing' className={`h-group ${location.pathname === '/pricing' ? 'active' : ''}`}>
+                                    {/* <HiOutlineHome className='h-i'/> */}
+                                    <span>Pricing</span>
                                 </Link>
 
                             </div>

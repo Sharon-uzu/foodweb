@@ -8,35 +8,35 @@ import p4 from "../Assets/Ellipse 8.png";
 const testimonials = [
   {
     id: 1,
-    name: "George Dammy",
-    profession: "Medical Practitioner",
+    name: "Chinedu O.",
+    profession: "Restaurant Owner",
     image: p1,
     review:
-      "I absolutely love the recipes on this site! Every dish I’ve tried has been a hit with my family, and the step-by-step guides make ordering so easy.",
+      "ScanOrder has completely transformed how we serve our customers! Orders come in seamlessly, and our staff can focus on delivering great service rather than handling paper menus. Sales have increased, and customers love the convenience!",
   },
   {
     id: 2,
-    name: "Sarah Johnson",
-    profession: "Chef",
+    name: "Amaka U.",
+    profession: "Frequent Diner",
     image: p2,
     review:
-      "The food quality is top-notch! The ingredients are always fresh, and the recipes are easy to follow. Highly recommended!",
+      "I no longer have to wait for a menu or a server to take my order. Just scan, select my meal, and it’s on the way. This is the future of dining, and I love it!",
   },
   {
     id: 3,
-    name: "David Opeyemi",
-    profession: "Software Engineer",
+    name: "Johnson T.",
+    profession: "Bar Manager",
     image: p3,
     review:
-      "Amazing service! The meals are delicious and the delivery is always on time. This has become my go-to food service.",
+      "Managing drink orders during peak hours used to be a nightmare, but ScanOrder has made it so much easier! Our bartenders can see orders instantly and serve drinks faster, keeping customers happy and increasing our revenue.",
   },
   {
     id: 4,
-    name: "Lisa Brown",
-    profession: "Nutritionist",
+    name: "Ngozi E.",
+    profession: "Hotel Operations Manager",
     image: p4,
     review:
-      "As a nutritionist, I appreciate the healthy options available. It’s great to see a variety of well-balanced meals!",
+      "We introduced ScanOrder in our hotel restaurant, and the feedback has been phenomenal. Guests love the contactless ordering system, and our efficiency has improved. Highly recommended for any hospitality business!",
   },
 ];
 
@@ -48,7 +48,7 @@ const Testimonial = () => {
         {testimonials.map((testimonial) => (
           <div className="test" key={testimonial.id}>
             <div className="test-c">
-              <img src={testimonial.image} alt={testimonial.name} />
+              {/* <img src={testimonial.image} alt={testimonial.name} /> */}
               <p>{testimonial.review}</p>
               <div className="star-txts">
                 <div className="text">
