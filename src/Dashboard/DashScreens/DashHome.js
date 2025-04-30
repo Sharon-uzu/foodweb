@@ -87,7 +87,7 @@ const DashHome = ({ userDetails, profileImage }) => {
                             <h3>Sales Analytics</h3>
 
                             <div className="dh-cards">
-                                <div className="dh-card">
+                                <div className="dh-card" style={{background:'#CBE4D0'}}>
                                     <div className="dh-card-c">
                                         <MdOutlineSendToMobile className='d-icon' />
                                         <p>Total Sales</p>

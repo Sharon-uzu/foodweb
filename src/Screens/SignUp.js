@@ -38,6 +38,89 @@ const SignUp = () => {
         return errors;  
     };  
 
+    // const handleSubmit = async (e) => {  
+    //     e.preventDefault();  
+    //     const errors = validate(formData);  
+    //     setFormErrors(errors);  
+        
+    //     if (Object.keys(errors).length === 0) {  
+    //         setIsLoading(true);  
+    //         try {  
+    //             // Check if email or business already exists.  
+    //             const { data, error } = await Supabase  
+    //                 .from("food-web-admin")  
+    //                 .select("email, business")  
+    //                 .or(`email.eq.${formData.email},business.eq.${formData.business}`)  
+    //                 .single();  
+    
+    //             if (data) {  
+    //                 if (data.email === formData.email) {  
+    //                     alert("Email already registered");  
+    //                 } else if (data.business === formData.business) {  
+    //                     alert("Business name already registered");  
+    //                 }  
+    //                 setIsLoading(false);  
+    //                 return;  
+    //             }  
+    
+    //             if (error && error.code !== "PGRST116") {  
+    //                 console.error("Error checking email and business:", error);  
+    //                 setIsLoading(false);  
+    //                 return;  
+    //             }  
+    
+    //             // Insert user data without image URL first.  
+    //             const response = await Supabase.from("food-web-admin").insert([  
+    //                 {  
+    //                     fullname: formData.fullname,  
+    //                     business: formData.business,  
+    //                     email: formData.email,  
+    //                     phone: formData.phone,  
+    //                     password: formData.password,  
+    //                     image: null // Placeholder for the image URL  
+    //                 }  
+    //             ]);  
+    
+    //             if (response.error) {  
+    //                 throw response.error;  
+    //             }  
+    
+    //             // Upload image to Supabase Storage  
+    //             let imageUrl = null;  
+    //             if (logoFile) {  
+    //                 const fileName = `${Date.now()}-${logoFile.name}`;  
+    //                 const { error: uploadError } = await Supabase.storage  
+    //                     .from('food-logo')  
+    //                     .upload(fileName, logoFile);  
+    
+    //                 if (uploadError) {  
+    //                     console.error("Error uploading image:", uploadError);  
+    //                     alert("Failed to upload the logo. Please try again.");  
+    //                 } else {  
+    //                     // If upload is successful, generate the public URL  
+    //                     imageUrl = Supabase.storage.from('food-logo').getPublicUrl(fileName).data.publicUrl;  
+    
+    //                     // Update user record with the image URL  
+    //                     const { error: updateError } = await Supabase  
+    //                         .from("food-web-admin")  
+    //                         .update({ image: imageUrl }) // Update image column  
+    //                         .eq("email", formData.email); // Filter by email  
+    
+    //                     if (updateError) {  
+    //                         console.error("Error updating user image:", updateError);  
+    //                     }  
+    //                 }  
+    //             }  
+    
+    //             navigate("/signin");  
+    //         } catch (error) {  
+    //             console.error("Error during signup:", error);  
+    //         } finally {  
+    //             setIsLoading(false);  
+    //         }  
+    //     }  
+    // };    
+
     const handleSubmit = async (e) => {  
         e.preventDefault();  
         const errors = validate(formData);  
@@ -46,81 +129,51 @@ const SignUp = () => {
         if (Object.keys(errors).length === 0) {  
             setIsLoading(true);  
             try {  
-                // Check if email or business already exists.  
-                const { data, error } = await Supabase  
-                    .from("food-web-admin")  
-                    .select("email, business")  
-                    .or(`email.eq.${formData.email},business.eq.${formData.business}`)  
-                    .single();  
+                const res = await fetch("https://scanorder-server-idac.vercel.app/api/v1/auth/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name: formData.fullname,
+                        email: formData.email,
+                        phone: formData.phone,
+                        companyName: formData.business,
+                        password: formData.password
+                    })
+                });
     
-                if (data) {  
-                    if (data.email === formData.email) {  
-                        alert("Email already registered");  
-                    } else if (data.business === formData.business) {  
-                        alert("Business name already registered");  
-                    }  
-                    setIsLoading(false);  
-                    return;  
-                }  
+                // Check if response is actually JSON
+                const contentType = res.headers.get("content-type");
+                let data;
+                
+                if (contentType && contentType.includes("application/json")) {
+                    data = await res.json();
+                } else {
+                    const text = await res.text();
+                    console.warn("Non-JSON response from API:", text);
+                    throw new Error(text); // throw the plain text as error
+                }
     
-                if (error && error.code !== "PGRST116") {  
-                    console.error("Error checking email and business:", error);  
-                    setIsLoading(false);  
-                    return;  
-                }  
+                if (!res.ok) {
+                    throw new Error(data.message || "Registration failed");
+                }
     
-                // Insert user data without image URL first.  
-                const response = await Supabase.from("food-web-admin").insert([  
-                    {  
-                        fullname: formData.fullname,  
-                        business: formData.business,  
-                        email: formData.email,  
-                        phone: formData.phone,  
-                        password: formData.password,  
-                        image: null // Placeholder for the image URL  
-                    }  
-                ]);  
+                alert("Account created successfully!");
+                navigate("/signin");
     
-                if (response.error) {  
-                    throw response.error;  
-                }  
-    
-                // Upload image to Supabase Storage  
-                let imageUrl = null;  
-                if (logoFile) {  
-                    const fileName = `${Date.now()}-${logoFile.name}`;  
-                    const { error: uploadError } = await Supabase.storage  
-                        .from('food-logo')  
-                        .upload(fileName, logoFile);  
-    
-                    if (uploadError) {  
-                        console.error("Error uploading image:", uploadError);  
-                        alert("Failed to upload the logo. Please try again.");  
-                    } else {  
-                        // If upload is successful, generate the public URL  
-                        imageUrl = Supabase.storage.from('food-logo').getPublicUrl(fileName).data.publicUrl;  
-    
-                        // Update user record with the image URL  
-                        const { error: updateError } = await Supabase  
-                            .from("food-web-admin")  
-                            .update({ image: imageUrl }) // Update image column  
-                            .eq("email", formData.email); // Filter by email  
-    
-                        if (updateError) {  
-                            console.error("Error updating user image:", updateError);  
-                        }  
-                    }  
-                }  
-    
-                navigate("/signin");  
-            } catch (error) {  
-                console.error("Error during signup:", error);  
-            } finally {  
-                setIsLoading(false);  
-            }  
+            } catch (error) {
+                console.error("API Error:", error);
+                alert(error.message);
+            } finally {
+                setIsLoading(false);
+            }
         }  
-    };    
-
+    };
+    
+    
+    
+    
     return (  
         <div className='sign'>  
             <div className="membership">  
@@ -145,10 +198,10 @@ const SignUp = () => {
                         <input type="password" name="password" placeholder='Password' className='inp' onChange={handleChange} />  
                         {formErrors.password && <p style={{color:'red'}}>{formErrors.password}</p>}  
 
-                        <h6 style={{fontSize:'15px', marginBottom:'5px', fontWeight:400}}>Add your logo</h6>  
+                        {/* <h6 style={{fontSize:'15px', marginBottom:'5px', fontWeight:400}}>Add your logo</h6>  
                         <input type="file" name="logo" className='inp' onChange={handleChange} />  
                         {formErrors.image && <p style={{color:'red'}}>{formErrors.image}</p>}  
-                        
+                         */}
                         <button onClick={handleSubmit} disabled={isLoading}>{isLoading ? "Loading..." : "Create Account"}</button>  
 
                         <p className='else'>Have an account already? <Link to='/signin'>Login</Link></p>  

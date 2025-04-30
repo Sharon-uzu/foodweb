@@ -18,49 +18,107 @@ const SignIn = ({ setLoggedIn, setUserDetails }) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // const handleLogin = async () => {
+    //     setIsLoading(true);
+    //     setError('');
+    //     try {
+    //         const { data, error } = await Supabase
+    //             .from("food-web-admin")
+    //             .select("id, business, password")
+    //             .eq("email", formData.email)
+    //             .single();
+
+    //         if (!data || error) {
+    //             setError("Invalid email or password");
+    //             setIsLoading(false);
+    //             return;
+    //         }
+
+    //         if (data.password !== formData.password) {
+    //             setError("Incorrect password");
+    //             setIsLoading(false);
+    //             return;
+    //         }
+
+    //         const userDetails = {
+    //             id: data.id,
+    //             business: data.business,
+    //             email: formData.email,
+    //             image: data.image || "", // Assuming the image URL is stored in the database
+    //         };
+
+    //         localStorage.setItem("userId", data.id);
+    //         localStorage.setItem("userDetails", JSON.stringify(userDetails));
+    //         setLoggedIn(true);
+    //         setUserDetails(userDetails);
+
+    //         navigate("/admin");
+    //     } catch (err) {
+    //         console.error("Login error:", err);
+    //         setError("Something went wrong. Please try again.");
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
+
+
     const handleLogin = async () => {
         setIsLoading(true);
         setError('');
+        if (!formData.email || !formData.password) {
+            setError("Please fill in all fields");
+            setIsLoading(false);
+            return;
+        }
+        
         try {
-            const { data, error } = await Supabase
-                .from("food-web-admin")
-                .select("id, business, password")
-                .eq("email", formData.email)
-                .single();
-
-            if (!data || error) {
-                setError("Invalid email or password");
-                setIsLoading(false);
-                return;
+            const res = await fetch("https://scanorder-server-idac.vercel.app/api/v1/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: formData.email,
+                    password: formData.password
+                })
+            });
+    
+            const contentType = res.headers.get("content-type");
+    
+            let data;
+            if (contentType && contentType.includes("application/json")) {
+                data = await res.json();
+            } else {
+                const text = await res.text();
+                throw new Error(text);
             }
-
-            if (data.password !== formData.password) {
-                setError("Incorrect password");
-                setIsLoading(false);
-                return;
+    
+            if (!res.ok) {
+                throw new Error(data.message || "Login failed");
             }
-
+    
+            // Assuming response includes user info like token, id, business, etc.
             const userDetails = {
-                id: data.id,
-                business: data.business,
-                email: formData.email,
-                image: data.image || "", // Assuming the image URL is stored in the database
+                id: data.user?.id,
+                business: data.user?.companyName,
+                email: data.user?.email,
+                token: data.token, // if token is returned
             };
-
-            localStorage.setItem("userId", data.id);
+    
             localStorage.setItem("userDetails", JSON.stringify(userDetails));
             setLoggedIn(true);
             setUserDetails(userDetails);
-
-            navigate("/admin");
+            navigate("/vendor");
+    
         } catch (err) {
             console.error("Login error:", err);
-            setError("Something went wrong. Please try again.");
+            setError(err.message || "Something went wrong. Please try again.");
         } finally {
             setIsLoading(false);
         }
     };
 
+    
     return (
         <div className='sign sign-c'>
             <div className="membership">

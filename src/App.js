@@ -18,6 +18,14 @@ import Users from './Dashboard/DashScreens/Users';
 import { Supabase } from './config/supabase-config';  
 import OrderSuccess from './Screens/OrderSuccess';
 import Pricing from './Screens/Pricing';
+import Homepage from './VendorDashboard/VendorsScreen/Homepage';
+import AddProducts from './VendorDashboard/VendorsScreen/AddProducts';
+import VendorsOrders from './VendorDashboard/VendorsScreen/VendorsOrders';
+import VendorLogout from './VendorDashboard/VendorsScreen/VendorLogout';
+import Account from './VendorDashboard/VendorsScreen/Account';
+import VendorService from './VendorDashboard/VendorsScreen/VendorService';
+import ScanPoint from './VendorDashboard/VendorsScreen/ScanPoint';
+import VendorFinance from './VendorDashboard/VendorsScreen/VendorFinance';
 
 function App() {  
     const navigate = useNavigate();  
@@ -101,6 +109,17 @@ function App() {
                     <Route path='/signin' element={<SignIn setLoggedIn={setLoggedIn} setUserDetails={setUserDetails} />} />  
                     <Route path='/passwordreset' element={<PasswordReset />} />  
 
+                    {/* Vendor dashboard */}
+                    <Route path='/vendor' element={<Homepage />} />
+                    <Route path='/addproducts' element={<AddProducts />} />
+                    <Route path='/vendors-orders' element={<VendorsOrders />} />
+                    <Route path='/vlogout' element={<VendorLogout />} />
+                    <Route path='/account' element={<Account />} />
+                    <Route path='/vendor-service' element={<VendorService />} />
+                    <Route path='/scanpoint' element={<ScanPoint />} />
+                    <Route path='/vendor-finance' element={<VendorFinance />} />
+
+
                     {/* Admin dashboard */}  
                     {loggedIn && (  
                         <>  
@@ -112,8 +131,7 @@ function App() {
                             <Route path='/users' element={<Users userId={userDetails?.id} userDetails={userDetails} profileImage={profileImage}/>} />  
                         </>  
                     )}  
-                </Routes>  
-             
+                </Routes>       
             </CartProvider>  
         </div>  
     );  
