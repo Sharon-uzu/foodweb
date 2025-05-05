@@ -1,17 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import VendorsSidebar from '../VendorsComponents/VendorsSidebar';
 import { Link } from 'react-router-dom';
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { IoIosLogOut } from "react-icons/io";
-import { FaRegBell } from "react-icons/fa6";
-import { CiGlobe } from "react-icons/ci";
-import { IoIosHelpCircleOutline } from "react-icons/io";
-import { MdKeyboardArrowRight } from "react-icons/md";
-import defaultDp from '../../Assets/Admin photo.png';
 import { IoArrowBackOutline } from "react-icons/io5";
 import { GoPlus } from "react-icons/go";
 import pro from '../../Assets/lucide_image.png';
-import { CiUser } from "react-icons/ci";
 import img1 from '../../Assets/clarity_success-line.png';
 import { IoCloseSharp } from "react-icons/io5";
 import img from '../../Assets/Product page Images.png';
@@ -20,6 +12,8 @@ import { HiDotsHorizontal } from "react-icons/hi";
 import { MdOutlineCancel } from "react-icons/md";
 import { FaRegEye } from "react-icons/fa";
 import img2 from '../../Assets/image 135.png'
+import VendorHeader from '../VendorsComponents/VendorHeader';
+import { useNavigate } from 'react-router-dom';
 
 
 const productItems = [
@@ -132,14 +126,6 @@ const VendorService = () => {
   const [isToggled, setIsToggled] = useState(false);
   const handleToggle = () => setIsToggled(!isToggled);
 
-  const profileRef = useRef(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAccountOpen, setIsAccountOpen] = useState(false);
-  const toggleDropdown = () => setIsOpen(!isOpen);
-  const toggleAccountDropdown = () => {
-    setIsAccountOpen(!isAccountOpen);
-    setIsOpen(true);
-  };
 
   const [serviceGenerated, setServiceGenerated] = useState(false);
   const handleGenerateService = () => setServiceGenerated(true);
@@ -148,8 +134,6 @@ const VendorService = () => {
   const [showModal, setShowModal] = useState(false);
   const [serviceFinalized, setServiceFinalized] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
-
-  const handleGenerateSuccess = () => setShowModal(true);
 
   useEffect(() => {
     if (showModal) {
@@ -205,81 +189,68 @@ const VendorService = () => {
 
 const [showAddItemModal, setShowAddItemModal] = useState(false);
 
+const [isSubmitting, setIsSubmitting] = useState(false);
+
+
+const [serviceData, setServiceData] = useState({
+  service: '',
+  description: '',
+  hasPaidItems: false,
+});
+
+const handleGenerateSuccess = async () => {
+  setIsSubmitting(true);
+
+  const payload = {
+    service: "Laundry",
+    description: "We offer laundry service for free",
+    hasPaidItems: isToggled,
+  };
+
+  try {
+    const token = localStorage.getItem("token"); // Assuming token is stored
+    const response = await fetch("https://scanorder-server.vercel.app/api/v1/user/createService", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // Make sure token is present
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) throw new Error("Failed to create service");
+
+    const data = await response.json();
+    console.log("Service created:", data);
+    setShowModal(true); // Success modal
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong. Try again.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+const navigate = useNavigate();
+const [user, setUser] = useState(null);
+
+useEffect(() => {
+  const savedUser = localStorage.getItem('userDetails');
+  if (!savedUser) {
+    navigate('/'); // redirect to SignIn if not logged in
+  } else {
+    const parsedUser = JSON.parse(savedUser);
+    console.log('hello:', parsedUser); // 👈 Log the user details here
+    setUser(parsedUser);
+  }
+}, []);
+
+
+if (!user) return null;
 
   return (
     <div style={{ background: "#fcf9f8" }}>
-      <header className='adminheader vendorheader'>
-        <nav>
-          <ul>
-            <Link to='/' className='h-group'>
-              <FaRegBell className='h-i' style={{ color: '#FF7700' }} />
-            </Link>
-            <div className='h-group profile' ref={profileRef} onClick={toggleDropdown}>
-              <img src={defaultDp} alt="Admin Profile" className="profile-image" />
-              <div>
-                <h5>User</h5>
-                <p>Admin</p>
-              </div>
-              {isOpen ? <IoIosArrowUp className='h-i' /> : <IoIosArrowDown className='h-i' />}
-              {isOpen && (
-                <div className="profile-dropdown">
-                  <Link onClick={toggleAccountDropdown}>
-                    <div className="prof">
-                      <div>
-                        <CiUser className='d-i' />
-                        <h5>Account</h5>
-                      </div>
-                      <MdKeyboardArrowRight className='d-i' />
-                    </div>
-                  </Link>
-                  <Link to="/profile">
-                    <div className="prof">
-                      <div>
-                        <FaRegBell className='d-i' />
-                        <h5>Notification</h5>
-                      </div>
-                    </div>
-                  </Link>
-                  <Link to="/profile">
-                    <div className="prof">
-                      <div>
-                        <CiGlobe className='d-i' />
-                        <h5>App Language</h5>
-                      </div>
-                    </div>
-                  </Link>
-                  <Link to="/profile">
-                    <div className="prof">
-                      <div>
-                        <IoIosHelpCircleOutline className='d-i' />
-                        <h5>Help</h5>
-                      </div>
-                    </div>
-                  </Link>
-                  <br /><br />
-                  <Link to="/profile">
-                    <div className="prof">
-                      <div>
-                        <IoIosLogOut className='d-i' />
-                        <h5>Log Out</h5>
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              )}
-              {isAccountOpen && (
-                <div className="profile-dropdown acct-dropdown">
-                  <h3>User</h3>
-                  <h3>user@gmail.com</h3>
-                  <Link to='/signin'><button>Login another account</button></Link>
-                  <div><button className='btn2' onClick={toggleAccountDropdown}>Close</button></div>
-                  <Link style={{ color: '#FF7700' }} to='/signin'>LogOut</Link>
-                </div>
-              )}
-            </div>
-          </ul>
-        </nav>
-      </header>
+      {/* <VendorHeader/> */}
 
       <div className="main">
         <VendorsSidebar />
@@ -312,24 +283,30 @@ const [showAddItemModal, setShowAddItemModal] = useState(false);
                 <div className="product-modal-overlay vendor-service">
                   <div className="modal">
                     <form className='pm-form'>
-                      <div className="image-file">
-                        <div className='add-img'>
-                          <img src={pro} alt="" />
-                          <div>
-                            <GoPlus className='plus' />
-                            <p>Add product image</p>
-                          </div>
-                        </div>
-                      </div>
-                      <input type="text" placeholder="Service title" />
-                      <textarea cols="30" rows="10" placeholder='Description'></textarea>
+                      
+                    <input
+                      type="text"
+                      placeholder="Service title"
+                      value={serviceData.service}
+                      onChange={(e) => setServiceData({ ...serviceData, service: e.target.value })}
+                    />
+                      <textarea
+                        cols="30"
+                        rows="10"
+                        placeholder='Description'
+                        value={serviceData.description}
+                        onChange={(e) => setServiceData({ ...serviceData, description: e.target.value })}
+                      />
                       <div className="toggle-p">
                         <div className="tp-c">
                           <h5>Has paid item?</h5>
                           <div className="toggle-container">
                             <div
                               className={`toggle-button ${isToggled ? 'toggled' : ''}`}
-                              onClick={handleToggle}
+                              onClick={() => {
+                                setIsToggled(!isToggled);
+                                setServiceData(prev => ({ ...prev, hasPaidItems: !prev.hasPaidItems }));
+                              }}
                             >
                               <div className="toggle-circle"></div>
                             </div>
@@ -337,7 +314,9 @@ const [showAddItemModal, setShowAddItemModal] = useState(false);
                         </div>
                       </div>
                       <div className="modal-buttons">
-                        <button type="button" onClick={handleGenerateSuccess}>Add Now</button>
+                        <button type="button" onClick={handleGenerateSuccess}>
+                          {isSubmitting ? "Loading..." : "Add Now"}
+                        </button>
                         <button className='b-cancel' type="button" onClick={handleDegenerateService}>Cancel</button>
                       </div>
                     </form>

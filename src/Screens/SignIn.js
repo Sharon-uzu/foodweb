@@ -18,50 +18,7 @@ const SignIn = ({ setLoggedIn, setUserDetails }) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // const handleLogin = async () => {
-    //     setIsLoading(true);
-    //     setError('');
-    //     try {
-    //         const { data, error } = await Supabase
-    //             .from("food-web-admin")
-    //             .select("id, business, password")
-    //             .eq("email", formData.email)
-    //             .single();
-
-    //         if (!data || error) {
-    //             setError("Invalid email or password");
-    //             setIsLoading(false);
-    //             return;
-    //         }
-
-    //         if (data.password !== formData.password) {
-    //             setError("Incorrect password");
-    //             setIsLoading(false);
-    //             return;
-    //         }
-
-    //         const userDetails = {
-    //             id: data.id,
-    //             business: data.business,
-    //             email: formData.email,
-    //             image: data.image || "", // Assuming the image URL is stored in the database
-    //         };
-
-    //         localStorage.setItem("userId", data.id);
-    //         localStorage.setItem("userDetails", JSON.stringify(userDetails));
-    //         setLoggedIn(true);
-    //         setUserDetails(userDetails);
-
-    //         navigate("/admin");
-    //     } catch (err) {
-    //         console.error("Login error:", err);
-    //         setError("Something went wrong. Please try again.");
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // };
-
-
+  
     const handleLogin = async () => {
         setIsLoading(true);
         setError('');
@@ -72,7 +29,7 @@ const SignIn = ({ setLoggedIn, setUserDetails }) => {
         }
         
         try {
-            const res = await fetch("https://scanorder-server-idac.vercel.app/api/v1/auth/login", {
+            const res = await fetch("https://scanorder-server.vercel.app/api/v1/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -98,14 +55,18 @@ const SignIn = ({ setLoggedIn, setUserDetails }) => {
             }
     
             // Assuming response includes user info like token, id, business, etc.
+            // First, log the full response to see what it contains
+            console.log("Full login response:", data);
+
+            // Assume the response has a `token` field and `user` object
             const userDetails = {
                 id: data.user?.id,
                 business: data.user?.companyName,
                 email: data.user?.email,
-                token: data.token, // if token is returned
+                token: data.token, // make sure your API response includes token
             };
-    
             localStorage.setItem("userDetails", JSON.stringify(userDetails));
+    
             setLoggedIn(true);
             setUserDetails(userDetails);
             navigate("/vendor");

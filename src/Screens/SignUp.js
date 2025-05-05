@@ -121,55 +121,63 @@ const SignUp = () => {
     //     }  
     // };    
 
-    const handleSubmit = async (e) => {  
-        e.preventDefault();  
-        const errors = validate(formData);  
-        setFormErrors(errors);  
-        
-        if (Object.keys(errors).length === 0) {  
-            setIsLoading(true);  
-            try {  
-                const res = await fetch("https://scanorder-server-idac.vercel.app/api/v1/auth/register", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        name: formData.fullname,
-                        email: formData.email,
-                        phone: formData.phone,
-                        companyName: formData.business,
-                        password: formData.password
-                    })
-                });
-    
-                // Check if response is actually JSON
-                const contentType = res.headers.get("content-type");
-                let data;
-                
-                if (contentType && contentType.includes("application/json")) {
-                    data = await res.json();
-                } else {
-                    const text = await res.text();
-                    console.warn("Non-JSON response from API:", text);
-                    throw new Error(text); // throw the plain text as error
-                }
-    
-                if (!res.ok) {
-                    throw new Error(data.message || "Registration failed");
-                }
-    
-                alert("Account created successfully!");
-                navigate("/signin");
-    
-            } catch (error) {
-                console.error("API Error:", error);
-                alert(error.message);
-            } finally {
-                setIsLoading(false);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const errors = validate(formData);
+        setFormErrors(errors);
+      
+        if (Object.keys(errors).length === 0) {
+          setIsLoading(true);
+          try {
+            const res = await fetch("https://scanorder-server.vercel.app/api/v1/auth/register", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                name: formData.fullname,
+                email: formData.email,
+                phone: formData.phone,
+                companyName: formData.business,
+                password: formData.password
+              })
+            });
+      
+            // Check if response is JSON
+            const contentType = res.headers.get("content-type");
+            let data;
+      
+            if (contentType && contentType.includes("application/json")) {
+              data = await res.json();
+            } else {
+              const text = await res.text();
+              console.warn("Non-JSON response from API:", text);
+              throw new Error(text);
             }
-        }  
-    };
+      
+            if (!res.ok) {
+                throw new Error(data.message || "Registration failed");
+              }
+              
+              // ✅ Save token and user details
+              localStorage.setItem("token", data.token); // Store token
+              localStorage.setItem("userDetails", JSON.stringify(data.user || data)); // Store user info
+              
+            console.log(data)
+      
+            alert("Account created successfully!");      
+            
+            // redirect to signin, already stores user info
+            navigate("/signin");
+      
+          } catch (error) {
+            console.error("API Error:", error);
+            alert(error.message);
+          } finally {
+            setIsLoading(false);
+          }
+        }
+      };
     
     
     

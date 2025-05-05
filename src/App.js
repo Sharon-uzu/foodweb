@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';  
-import { Route, Routes, useNavigate } from 'react-router-dom';  
+import { Route, Routes, useNavigate } from 'react-router-dom'; 
+import { Navigate } from 'react-router-dom';
 import './App.css';  
 import Home from './Screens/Home';  
 import Cart from './Screens/Cart';  
@@ -26,53 +27,48 @@ import Account from './VendorDashboard/VendorsScreen/Account';
 import VendorService from './VendorDashboard/VendorsScreen/VendorService';
 import ScanPoint from './VendorDashboard/VendorsScreen/ScanPoint';
 import VendorFinance from './VendorDashboard/VendorsScreen/VendorFinance';
+import Notification from './VendorDashboard/VendorsScreen/Notification';
 
 function App() {  
     const navigate = useNavigate();  
     const [loggedIn, setLoggedIn] = useState(false);  
     const [userDetails, setUserDetails] = useState(null);  
-    const [profileImage, setProfileImage] = useState(null);  
+    const [profileImage, setProfileImage] = useState(null);   
 
-    useEffect(() => {  
-        const storedUserDetails = localStorage.getItem('userDetails');  
-        if (storedUserDetails) {  
-            const parsedUserDetails = JSON.parse(storedUserDetails);  
-            setLoggedIn(true);  
-            setUserDetails(parsedUserDetails);  
 
-            // Fetch profile image  
-            fetchProfileImage(parsedUserDetails.image);  
-        } else {  
-            const checkSession = async () => {  
-                const { data: { session } } = await Supabase.auth.getSession();  
-                if (session) {  
-                    const { data, error } = await Supabase  
-                        .from("food-web-admin")  
-                        .select("id, email, business, image")  
-                        .eq("email", session.user.email)  
-                        .single();  
-            
-                    if (error) {  
-                        console.error("Error fetching user data:", error.message);  
-                        return;  
-                    }  
-            
-                    if (data) {  
-                        setLoggedIn(true);  
-                        setUserDetails(data);  
-                        localStorage.setItem("userDetails", JSON.stringify(data));  
+    useEffect(() => {
+        const fetchUser = async () => {
+            const stored = localStorage.getItem("userDetails");
+            if (!stored) return;
+    
+            const { token } = JSON.parse(stored);
+    
+            try {
+                const res = await fetch("https://scanorder-server-idac.vercel.app/api/v1/auth/me", {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+    
+                if (!res.ok) {
+                    throw new Error("Session invalid or expired");
+                }
+    
+                const data = await res.json();
+                setUserDetails(data.user);
+                setLoggedIn(true);
+            } catch (err) {
+                console.error("Session error:", err);
+                localStorage.removeItem("userDetails");
+                setLoggedIn(false);
+            }
+        };
+    
+        fetchUser();
+    }, []);
+    
 
-                        // Fetch profile image  
-                        fetchProfileImage(data.image);  
-                    }  
-                } else {  
-                    setLoggedIn(false);  
-                    setUserDetails(null);  
-                }  
-            };  
-            checkSession();  
-        }  
-    }, []);  
 
     const fetchProfileImage = async (imageFileName) => {  
         if (imageFileName) {  
@@ -106,18 +102,28 @@ function App() {
                     <Route path='/signup' element={<SignUp />} />
                     <Route path='/pricing' element={<Pricing />} />
                     <Route path='/ordersuccess' element={<OrderSuccess />} />  
-                    <Route path='/signin' element={<SignIn setLoggedIn={setLoggedIn} setUserDetails={setUserDetails} />} />  
+                    <Route path="/signin" element={<SignIn setLoggedIn={setLoggedIn} setUserDetails={setUserDetails} />} />
                     <Route path='/passwordreset' element={<PasswordReset />} />  
 
                     {/* Vendor dashboard */}
-                    <Route path='/vendor' element={<Homepage />} />
+                    <Route 
+                        path="/vendor" 
+                        element={loggedIn ? <Homepage userDetails={userDetails} /> : <Navigate to="/signin" />} 
+                    />
+                    <Route 
+                        path="/vendor-service" 
+                        element={loggedIn ? <VendorService userDetails={userDetails} /> : <Navigate to="/signin" />} 
+                    />
+
                     <Route path='/addproducts' element={<AddProducts />} />
                     <Route path='/vendors-orders' element={<VendorsOrders />} />
                     <Route path='/vlogout' element={<VendorLogout />} />
                     <Route path='/account' element={<Account />} />
-                    <Route path='/vendor-service' element={<VendorService />} />
+                    {/* <Route path='/vendor-service' element={<VendorService />} /> */}
                     <Route path='/scanpoint' element={<ScanPoint />} />
                     <Route path='/vendor-finance' element={<VendorFinance />} />
+                    <Route path='/vendor-notification' element={<Notification />} />
+
 
 
                     {/* Admin dashboard */}  
