@@ -1,135 +1,107 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useLoginMutation } from '../redux-state/api/apiSlice'; 
+import { useAuth } from '../state/AuthContext';
+import AuthService from '../services/AuthService';
 import logo from '../Assets/ScanOrder logo pdf.png';
-import img from '../Assets/sign.png';
-import gg from '../Assets/google.png';
-import fb from '../Assets/faceb.png';
 import img1 from '../Assets/sec.png';
-import { Supabase } from '../config/supabase-config';
-
 const SignIn = ({ setLoggedIn, setUserDetails }) => {
-    const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({ email: '', password: '' });
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
+  const { authLogin } = useAuth(); // Correct usage of useAuth hook
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
   
-    const handleLogin = async () => {
-        setIsLoading(true);
-        setError('');
-        if (!formData.email || !formData.password) {
-            setError("Please fill in all fields");
-            setIsLoading(false);
-            return;
-        }
-        
-        try {
-            const res = await fetch("https://scanorder-server.vercel.app/api/v1/auth/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    email: formData.email,
-                    password: formData.password
-                })
-            });
-    
-            const contentType = res.headers.get("content-type");
-    
-            let data;
-            if (contentType && contentType.includes("application/json")) {
-                data = await res.json();
-            } else {
-                const text = await res.text();
-                throw new Error(text);
-            }
-    
-            if (!res.ok) {
-                throw new Error(data.message || "Login failed");
-            }
-    
-            // Assuming response includes user info like token, id, business, etc.
-            // First, log the full response to see what it contains
-            console.log("Full login response:", data);
+  // Destructuring 'isLoading' and 'login' from useLoginMutation hook
+  const [login, { isLoading }] = useLoginMutation();
 
-            // Assume the response has a `token` field and `user` object
-            const userDetails = {
-                id: data.user?.id,
-                business: data.user?.companyName,
-                email: data.user?.email,
-                token: data.token, // make sure your API response includes token
-            };
-            localStorage.setItem("userDetails", JSON.stringify(userDetails));
-    
-            setLoggedIn(true);
-            setUserDetails(userDetails);
-            navigate("/vendor");
-    
-        } catch (err) {
-            console.error("Login error:", err);
-            setError(err.message || "Something went wrong. Please try again.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
-    
-    return (
-        <div className='sign sign-c'>
-            <div className="membership">
-                <div className="member-form">
-                        <div className="l-form">
-                            <Link to='/'><img src={logo} alt="Logo" className='f-logo' /></Link>
-                            <p>Sign in to continue with...</p>
-                            {/* <div className="sel">
-                                <img src={gg} alt="Google" />
-                                <span>Continue with Google</span>
-                            </div>
-                            <div className="sel">
-                                <img src={fb} alt="Facebook" />
-                                <span>Continue with Facebook</span>
-                            </div>
-                            <div className="or">
-                                <h6></h6>
-                                <span>or login</span>
-                                <h6></h6>
-                            </div> */}
-                            <input 
-                                type="email" 
-                                name="email" 
-                                placeholder='Email' 
-                                className='inp' 
-                                onChange={handleChange} 
-                            />
-                            <input 
-                                type="password" 
-                                name="password" 
-                                placeholder='Enter password' 
-                                className='inp' 
-                                onChange={handleChange} 
-                            />
-                            {error && <p style={{ color: 'red' }}>{error}</p>}
-                            <Link to='/passwordreset'><h5>Forgot password?</h5></Link>
-                                <button onClick={handleLogin} disabled={isLoading}>
-                                    {isLoading ? "Loading..." : "Sign in"}
-                                </button>
-                            <p className='else'>Don't have an account? <Link to='/signup'>Sign Up</Link></p>
-                            
-                        </div>
-                    
-                        
-                    
-                        <img src={img1} className='form-img' alt="Form Visual" />
-                </div>
-            </div>
+    const { user } = useAuth();
+
+useEffect(() => {
+  if (user) {
+    console.log("User now logged in, redirecting to /vendor");
+    navigate('/dashboard');
+  }
+}, [user]);
+
+
+const handleLogin = async () => {
+  setError('');
+  if (!formData.email || !formData.password) {
+    setError('Please fill in all fields');
+    return;
+  }
+
+  try {
+    const response = await login(formData).unwrap();
+    const userDetails = AuthService.formatLoginResponse(response);
+
+    localStorage.setItem('token', userDetails.token);
+    localStorage.setItem('authToken', userDetails.token); // For API calls
+    localStorage.setItem('userId', userDetails.user.id);  // ✅ Save user ID here
+    localStorage.setItem('userData', JSON.stringify(userDetails));
+
+    if (setLoggedIn) setLoggedIn(true);
+    if (setUserDetails) setUserDetails(userDetails);
+
+    authLogin(userDetails);
+    console.log("Login successful, userId saved:", userDetails.user.id);
+
+  } catch (err) {
+    setError(err?.data?.message || 'Login failed');
+    console.error('Login failed:', err);
+  }
+};
+
+   
+
+  return (
+    <div className="sign sign-c">
+      <div className="membership">
+        <div className="member-form">
+          <div className="l-form">
+            <Link to="/">
+              <img src={logo} alt="Logo" className="f-logo" />
+            </Link>
+            <p>Sign in to continue</p>
+
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              className="inp"
+              onChange={handleChange}
+            />
+
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter password"
+              className="inp"
+              onChange={handleChange}
+            />
+
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+
+            <Link to="/passwordreset">
+              <h5>Forgot password?</h5>
+            </Link>
+
+            <button onClick={handleLogin} disabled={isLoading}>
+              {isLoading ? 'Loading...' : 'Sign in'}
+            </button>
+
+            <p className="else">
+              Don't have an account? <Link to="/signup">Sign Up</Link>
+            </p>
+          </div>
+          <img src={img1} className="form-img" alt="Form Visual" />
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default SignIn;

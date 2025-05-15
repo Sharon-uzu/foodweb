@@ -52,7 +52,7 @@ const VendorFinance = () => {
               <div className="scan-form">  
                 <div className="add-btns">  
                   <div>  
-                    <Link to="/vendor">  
+                    <Link to="/dashboard">  
                       <IoArrowBackOutline className="p-back" />  
                     </Link>  
                     <h3>Account Registration</h3>  
@@ -172,7 +172,7 @@ const VendorFinance = () => {
               <div className="scan-form">  
                 <div className="add-btns">  
                   <div>  
-                    <Link to='/vendor'>  
+                    <Link to='/dashboard'>  
                       <IoArrowBackOutline className='p-back'/>  
                     </Link>  
                     <h3>Account Setup</h3>  

@@ -8,6 +8,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import { RiStarSFill } from "react-icons/ri";
 import food from '../../Assets/Mask Group.png'
+import { useNavigate } from 'react-router-dom';
 import { MdOutlineCancel } from "react-icons/md";
 import { FaRegEye } from "react-icons/fa";
 import img1 from '../../Assets/image 135.png'
@@ -104,15 +105,9 @@ const getStatusColor = (status) => {
   }
 };
 
-const Homepage = () => {
+const Homepage = ({user}) => {
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("userDetails");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-    }
-  }, []);
+ 
 
   const [currentIndex, setCurrentIndex] = useState(0);  
   const [reviewsPerPage, setReviewsPerPage] = useState(2);  
@@ -147,22 +142,30 @@ const Homepage = () => {
     }  
   };   
 
-
-  const [user, setUser] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("userDetails");
+    const storedUser = localStorage.getItem('userData');
     if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        console.log('User data:', parsedUser);  // Add this log
+      setUserData(JSON.parse(storedUser));
+    } else {
+      // Redirect to /signin if not authenticated
+      navigate('/signin');
     }
-}, []);
+  }, [navigate]);
 
-      
+  if (!userData) return <p>Loading user data...</p>;
+
+
   return (
     <div style={{background:"#fcf9f8"}}>
-      <VendorHeader user={user} />
+      {/* <h1>Welcome, {userData.user.name}</h1>
+      <p><strong>Email:</strong> {userData.user.email}</p>
+      <p><strong>Company:</strong> {userData.user.companyName}</p>
+      <p><strong>Status:</strong> {userData.user.status}</p>
+       */}
+      <VendorHeader user={userData.user} />
 
       <div className="main vendormain">  
           <VendorsSidebar />  

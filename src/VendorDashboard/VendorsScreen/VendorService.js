@@ -14,6 +14,9 @@ import { FaRegEye } from "react-icons/fa";
 import img2 from '../../Assets/image 135.png'
 import VendorHeader from '../VendorsComponents/VendorHeader';
 import { useNavigate } from 'react-router-dom';
+import { useCreateServiceMutation } from '../../redux-state/api/apiSlice'; // adjust path as needed
+import { useGetServicesQuery } from '../../redux-state/api/apiSlice';
+import AuthService from '../../services/AuthService';
 
 
 const productItems = [
@@ -89,12 +92,12 @@ const productItems = [
       },
   ];
 
- 
-  
+
   
 
 
-const VendorService = () => {
+const VendorService = ({user, userId}) => {
+
 
     // items
     const [activeStatus, setActiveStatus] = useState('All');
@@ -145,49 +148,10 @@ const VendorService = () => {
     }
   }, [showModal]);
 
-  const services = [
-    {
-      id: 1,
-      name: "VIP Service",
-      price: 35000,
-      oldPrice: 45000,
-      discount: "-14%",
-      scans: 554,
-      order: 235,
-      rating: 13,
-      img: img,
-      description:'A vibrant medley of nature’s sweetest gifts, our fruit salad is a refreshing burst of color, flavor, and nutrition in every bite.',
-    },
-    {
-      id: 2,
-      name: "VVIP Service",
-      price: 25000,
-      oldPrice: 30000,
-      discount: "-17%",
-      scans: 420,
-      order: 190,
-      rating: 22,
-      img: img,
-      description:'A vibrant medley of nature’s sweetest gifts, our fruit salad is a refreshing burst of color, flavor, and nutrition in every bite.',
-
-    },
-    {
-      id: 3,
-      name: "Regular Service",
-      price: 20000,
-      oldPrice: 25000,
-      discount: "-20%",
-      scans: 330,
-      order: 160,
-      rating: 18,
-      img: img,
-      description:'A vibrant medley of nature’s sweetest gifts, our fruit salad is a refreshing burst of color, flavor, and nutrition in every bite.',
-    }
-  ];
-
-//   Add item modal
-
+ 
 const [showAddItemModal, setShowAddItemModal] = useState(false);
+const [currentService, setCurrentService] = useState(null);
+
 
 const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -198,59 +162,151 @@ const [serviceData, setServiceData] = useState({
   hasPaidItems: false,
 });
 
+const [createService, { isLoading, error }] = useCreateServiceMutation();
+
+
 const handleGenerateSuccess = async () => {
   setIsSubmitting(true);
 
   const payload = {
-    service: "Laundry",
-    description: "We offer laundry service for free",
-    hasPaidItems: isToggled,
+    service: serviceData.service,
+    description: serviceData.description,
+    hasPaidItems: serviceData.hasPaidItems,
   };
 
   try {
-    const token = localStorage.getItem("token"); // Assuming token is stored
-    const response = await fetch("https://scanorder-server.vercel.app/api/v1/user/createService", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Make sure token is present
-      },
-      body: JSON.stringify(payload),
-    });
 
-    if (!response.ok) throw new Error("Failed to create service");
-
-    const data = await response.json();
-    console.log("Service created:", data);
-    setShowModal(true); // Success modal
-  } catch (error) {
-    console.error(error);
+    const result = await createService(serviceData).unwrap();
+    console.log('Service created:', result);
+    await fetchUserServices();
+    setShowModal(true);
+  } catch (err) {
+    console.error("Service creation error:", err);
     alert("Something went wrong. Try again.");
   } finally {
     setIsSubmitting(false);
   }
 };
 
-const navigate = useNavigate();
-const [user, setUser] = useState(null);
+const [userData, setUserData] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('userData');
+    if (storedUser) {
+      setUserData(JSON.parse(storedUser));
+    } else {
+      // Redirect to /signin if not authenticated
+      navigate('/signin');
+    }
+  }, [navigate]);
+
+
+const [userServices, setUserServices] = useState([]);
+
+const [loadingServices, setLoadingServices] = useState(false);
+
+const fetchUserServices = async () => {
+  try {
+    setLoadingServices(true);
+    const services = await AuthService.getUserServices(userData?.user?.id);
+    setUserServices(services);
+
+    // ✅ Automatically finalize if service already exists
+    if (services && services.length > 0) {
+      setServiceFinalized(true);
+      setServiceGenerated(false);
+    } else {
+      setServiceFinalized(false);
+    }
+  } catch (error) {
+    console.error("Failed to fetch services:", error);
+  } finally {
+    setLoadingServices(false);
+  }
+};
+
+
+
+
 
 useEffect(() => {
-  const savedUser = localStorage.getItem('userDetails');
-  if (!savedUser) {
-    navigate('/'); // redirect to SignIn if not logged in
-  } else {
-    const parsedUser = JSON.parse(savedUser);
-    console.log('hello:', parsedUser); // 👈 Log the user details here
-    setUser(parsedUser);
+  if (userData?.user?.id) {
+    fetchUserServices();
   }
-}, []);
+}, [userData]);
+
+const services = userServices;
+
+const { data } = useGetServicesQuery(userData?.user?.id, { skip: !userData?.user?.id });
 
 
-if (!user) return null;
+const [itemSubmitting, setItemSubmitting] = useState(false);
 
+
+const [itemData, setItemData] = useState({
+  item: '',
+  description: '',
+  amount: '',
+  category: ''
+});
+
+const handleSubmitItem = async (e) => {
+  e.preventDefault();
+  setItemSubmitting(true); // Start loading
+
+  const payload = {
+    serviceId: currentService?.id,
+    item: itemData.item,
+    description: itemData.description,
+    amount: Number(itemData.amount),
+    category: itemData.category
+  };
+
+  try {
+    const data = await AuthService.createServiceItem(payload);
+    console.log("Item added successfully:", data);
+
+    alert("Item added!");
+    setShowAddItemModal(false);
+    setItemData({ item: "", description: "", amount: "", category: "" });
+
+  } catch (err) {
+    console.error("Error adding item:", err.message);
+    alert("Error adding item. Check console.");
+  } finally {
+    setItemSubmitting(false);
+  }
+};
+
+
+
+
+
+  
+  if (!userData) return <p>Loading user data...</p>;
+
+  // console.log(userData);
+  
   return (
     <div style={{ background: "#fcf9f8" }}>
-      {/* <VendorHeader/> */}
+      
+      {/* {user && user.service && user.service.length > 0 ? (
+        <ul>
+          {user.service.map((serviceItem) => (
+            <li key={serviceItem.id}>
+              <p><strong>Description:</strong> {serviceItem.description}</p>
+              <p><strong>Has Paid Items:</strong> {serviceItem.hasPaidItems ? "Yes" : "No"}</p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No services available.</p>
+      )} */}
+
+
+
+      <VendorHeader user={userData.user}/>
 
       <div className="main">
         <VendorsSidebar />
@@ -273,7 +329,7 @@ if (!user) return null;
               <div className="scan-form">
                 <div className="add-btns">
                   <div>
-                    <Link to='/vendor'>
+                    <Link to='/dashboard'>
                       <IoArrowBackOutline className='p-back' />
                     </Link>
                     <h3>Service</h3>
@@ -282,7 +338,7 @@ if (!user) return null;
                 <br />
                 <div className="product-modal-overlay vendor-service">
                   <div className="modal">
-                    <form className='pm-form'>
+                    <div className='pm-form'>
                       
                     <input
                       type="text"
@@ -301,15 +357,17 @@ if (!user) return null;
                         <div className="tp-c">
                           <h5>Has paid item?</h5>
                           <div className="toggle-container">
-                            <div
-                              className={`toggle-button ${isToggled ? 'toggled' : ''}`}
-                              onClick={() => {
-                                setIsToggled(!isToggled);
-                                setServiceData(prev => ({ ...prev, hasPaidItems: !prev.hasPaidItems }));
-                              }}
-                            >
-                              <div className="toggle-circle"></div>
-                            </div>
+                          <div
+                            className={`toggle-button ${isToggled ? 'toggled' : ''}`} // ✅ Fixed className
+                            onClick={() => {
+                              const newToggle = !isToggled;
+                              setIsToggled(newToggle);
+                              setServiceData(prev => ({ ...prev, hasPaidItems: newToggle }));
+                            }}
+                          >
+                            <div className="toggle-circle"></div>
+                          </div>
+
                           </div>
                         </div>
                       </div>
@@ -319,7 +377,7 @@ if (!user) return null;
                         </button>
                         <button className='b-cancel' type="button" onClick={handleDegenerateService}>Cancel</button>
                       </div>
-                    </form>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -342,12 +400,12 @@ if (!user) return null;
               </div>
             )}
 
-            {/* SHOW LIST */}
+            {/* Service LIST */}
             {serviceFinalized && !selectedService && (
               <div>
                 <div className="add-btns">
                   <div>
-                    <Link to='/vendor'>
+                    <Link to='/dashboard'>
                       <IoArrowBackOutline className='p-back' />
                     </Link>
                     <h3>Service(s)</h3>
@@ -361,64 +419,74 @@ if (!user) return null;
                   </button>
                 </div>
                 <div className="uploaded-p">
-                  {services.map((service) => (
-                    <div
-                      className="product-card"
-                      key={service.id}
-                      onClick={() => setSelectedService(service)}
-                      style={{ cursor: 'pointer' }}
-                    >
+                  
+                
+                {userServices.length > 0 ? (
+                  userServices.map((service) => (
+                    <div className='product-card service-card' key={service.id} style={{cursor:'pointer'}} onClick={() => {
+                      setCurrentService(service);   // This sets the current service
+                      setShowAddItemModal(true);   // This opens the modal
+                    }}>
+                      {/* All usage of 'service' here */}
                       <div className="product1">
                         <div className="pp1-c">
-                          <div className="pp-top">
-                            <img src={service.img} alt={service.name} />
+                            <div className="pp-top">
+                            <img src={img} alt={service.service} />
                             <div className="pp-txt">
-                              <div className="p-name">
-                                <h4>{service.name}</h4>
-                                <HiDotsHorizontal className='ppp-i' />
-                              </div>
-                              <h3>N{service.price.toLocaleString()}</h3>
-                              <div className="bonus">
-                                <p>N{service.oldPrice.toLocaleString()}</p>
-                                <h6>{service.discount}</h6>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="row1">
-                            <div className="row1-c">
-                              <p>{service.description}</p>
-                            </div>
-                          </div>
-                          <div className="row1">
-                            <div className="row1-c">
-                              <p>No. of scans</p>
-                              <div>
-                                <LuArrowUp className='rr-i' />
-                                <p>{service.scans}</p>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="row1">
-                            <div className="row1-c">
-                              <p>No. of orders</p>
-                              <div>
-                                <div className="prog">
-                                  <span></span>
+                                <div className="p-name">
+                                <h4>{service.service}</h4>
+                                <HiDotsHorizontal className='ppp-i'/>
                                 </div>
-                                <p>{service.order}</p>
-                              </div>
+                                {/* <h3>N{service.price.toLocaleString()}</h3> */}
+                                <div className="bonus">
+                                {/* <p>N{service.oldPrice.toLocaleString()}</p> */}
+                                <h6>{service.discount}</h6>
+                                </div>
                             </div>
-                          </div>
-                          <div className="row1">
+                            </div>
+
+                            <div className="row1">
+                                <div className="row1-c">
+                                    <p>{service.description}</p>
+                                </div>
+                            </div>
+
+                            <div className="row1">
                             <div className="row1-c">
-                              <p>Review</p>
-                              <p>{service.rating}</p>
+                                <p>No. of sales</p>
+                                <div>
+                                <LuArrowUp className='rr-i'/>
+                                <p>{service.sales}</p>
+                                </div>
                             </div>
-                          </div>
+                            </div>
+
+                            <div className="row1">
+                            <div className="row1-c">
+                                <p>reamining product</p>
+                                <div>
+                                <div className="prog">
+                                    <span></span>
+                                </div>
+                                <p>{service.remaining}</p>
+                                </div>
+                            </div>
+                            </div>
+
+                            <div className="row1">
+                            <div className="row1-c">
+                                <p>Review</p>
+                                <p>{service.rating}</p>
+                            </div>
+                            </div>
                         </div>
-                      </div>
+                        </div>
+                      
                     </div>
-                  ))}
+                  ))
+                ) : (
+                  'No services'
+                )}
                 </div>
               </div>
             )}
@@ -501,42 +569,70 @@ if (!user) return null;
 
             {/* add item modal */}
 
-            {showAddItemModal && (
-                <div className="product-modal-overlay">
+            {showAddItemModal && currentService && (
+              <div className="product-modal-overlay">
                 <div className="modal">
-                    <h2>Add New Product</h2>
-                    <form>
-                        
-                        <div className="image-file">
-                            <div className='add-img'>
-                                <img src={pro} alt="" />
-                                <div>
-                                    <GoPlus className='plus'/>
-                                    <p>Add product image</p>
-                                </div>
-                            </div>
+                  <h2>
+                    Add Item to <span className="text-purple-700">{currentService.service}</span>
+                  </h2>
+
+                  <form>
+                    <div className="image-file">
+                      <div className='add-img'>
+                        <img src={pro} alt="" />
+                        <div>
+                          <GoPlus className='plus' />
+                          <p>Add product image</p>
                         </div>
+                      </div>
+                    </div>
 
-                        <input type="text" placeholder="Product Category" />
+                    <input
+                      type="text"
+                      placeholder="Product Category"
+                      value={itemData.category}
+                      onChange={(e) => setItemData({ ...itemData, category: e.target.value })}
+                    />
 
-                        <input type="text" placeholder="Product Name" />
+                    <input
+                      type="text"
+                      placeholder="Product Name"
+                      value={itemData.item}
+                      onChange={(e) => setItemData({ ...itemData, item: e.target.value })}
+                    />
 
-                        <input type="number" placeholder="Price" />
+                    <input
+                      type="number"
+                      placeholder="Price"
+                      value={itemData.amount}
+                      onChange={(e) => setItemData({ ...itemData, amount: e.target.value })}
+                    />
 
-                        <input type="number" placeholder="Quantity" />
+                    <input
+                      type="text"
+                      placeholder="Description"
+                      value={itemData.description}
+                      onChange={(e) => setItemData({ ...itemData, description: e.target.value })}
+                    />
 
-                        <input type="text" placeholder="Color" />
 
-                        <input type="text" placeholder="Size" />
-
-                        <div className="modal-buttons">
-                        <button type="submit">Save</button>
-                        <button className='b-cancel' type="button" onClick={() => setShowAddItemModal(false)}>Cancel</button>
-                        </div>
-                    </form>
+                    <div className="modal-buttons">
+                        <button type="submit" disabled={itemSubmitting} onClick={handleSubmitItem}>
+                        {itemSubmitting ? 'Adding...' : 'Add Item'}
+                      </button>
+                      <button
+                        className='b-cancel'
+                        type="button"
+                        onClick={() => setShowAddItemModal(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
                 </div>
-            </div>
+              </div>
             )}
+
 
 
           </div>

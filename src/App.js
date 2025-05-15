@@ -28,118 +28,98 @@ import VendorService from './VendorDashboard/VendorsScreen/VendorService';
 import ScanPoint from './VendorDashboard/VendorsScreen/ScanPoint';
 import VendorFinance from './VendorDashboard/VendorsScreen/VendorFinance';
 import Notification from './VendorDashboard/VendorsScreen/Notification';
+import {Provider} from "react-redux"
+import ProtectedRoute from './Components/ProtectedRoute';
+import { AuthProvider, useAuth } from './state/AuthContext'; 
+import { store } from './redux-state/store';
 
 function App() {  
-    const navigate = useNavigate();  
-    const [loggedIn, setLoggedIn] = useState(false);  
-    const [userDetails, setUserDetails] = useState(null);  
-    const [profileImage, setProfileImage] = useState(null);   
+  const { user } = useAuth(); // Gets current auth state
+  const navigate = useNavigate();
 
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            const stored = localStorage.getItem("userDetails");
-            if (!stored) return;
-    
-            const { token } = JSON.parse(stored);
-    
-            try {
-                const res = await fetch("https://scanorder-server-idac.vercel.app/api/v1/auth/me", {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-    
-                if (!res.ok) {
-                    throw new Error("Session invalid or expired");
-                }
-    
-                const data = await res.json();
-                setUserDetails(data.user);
-                setLoggedIn(true);
-            } catch (err) {
-                console.error("Session error:", err);
-                localStorage.removeItem("userDetails");
-                setLoggedIn(false);
-            }
-        };
-    
-        fetchUser();
-    }, []);
-    
-
-
-    const fetchProfileImage = async (imageFileName) => {  
-        if (imageFileName) {  
-            const { data } = Supabase  
-                .storage  
-                .from("food-logo")  
-                .getPublicUrl(imageFileName);  
-            if (data?.publicUrl) {  
-                setProfileImage(data.publicUrl);  
-            }  
-        }  
-    };  
-
-    // Sign out function  
-    const signOut = async () => {  
-        await Supabase.auth.signOut();  
-        setLoggedIn(false);  
-        setUserDetails(null);  
-        localStorage.removeItem("userDetails"); // Clear user details from local storage  
-        navigate('/signin'); // Redirect to sign-in page  
-    };  
+  // Optional: handle side effects, e.g., redirect on auth change
+//   useEffect(() => {
+//     if (!user && window.location.pathname.startsWith('/vendor')) {
+//       // If user is not logged in, redirect to sign-in when accessing protected routes
+//       navigate('/signin');
+//     }
+//   }, [user, navigate]);
 
     return (  
-        <div className="App">  
-            <CartProvider>   
-                <Routes>  
-                    <Route path='/' element={<Home />} />  
-                    <Route path='/cart' element={<Cart />} />  
-                    <Route path='/categories' element={<Categories />} />  
-                    <Route path='/contact' element={<Contact />} />  
-                    <Route path='/signup' element={<SignUp />} />
-                    <Route path='/pricing' element={<Pricing />} />
-                    <Route path='/ordersuccess' element={<OrderSuccess />} />  
-                    <Route path="/signin" element={<SignIn setLoggedIn={setLoggedIn} setUserDetails={setUserDetails} />} />
-                    <Route path='/passwordreset' element={<PasswordReset />} />  
+        <Provider store={store}>
+            <AuthProvider>
+                <div className="App">  
+                    <CartProvider>   
+                        <Routes>  
+                            <Route path='/' element={<Home />} />  
+                            <Route path='/cart' element={<Cart />} />  
+                            <Route path='/categories' element={<Categories />} />  
+                            <Route path='/contact' element={<Contact />} />  
+                            <Route path='/signup' element={<SignUp />} />
+                            <Route path='/pricing' element={<Pricing />} />
+                            <Route path='/ordersuccess' element={<OrderSuccess />} />  
+                            <Route path="/signin" element={<SignIn/>} />
+                            <Route path='/passwordreset' element={<PasswordReset />} />  
 
-                    {/* Vendor dashboard */}
-                    <Route 
-                        path="/vendor" 
-                        element={loggedIn ? <Homepage userDetails={userDetails} /> : <Navigate to="/signin" />} 
-                    />
-                    <Route 
-                        path="/vendor-service" 
-                        element={loggedIn ? <VendorService userDetails={userDetails} /> : <Navigate to="/signin" />} 
-                    />
+                            {/* Vendor dashboard */}
+                            {/* protecting our route */}
 
-                    <Route path='/addproducts' element={<AddProducts />} />
-                    <Route path='/vendors-orders' element={<VendorsOrders />} />
-                    <Route path='/vlogout' element={<VendorLogout />} />
-                    <Route path='/account' element={<Account />} />
-                    {/* <Route path='/vendor-service' element={<VendorService />} /> */}
-                    <Route path='/scanpoint' element={<ScanPoint />} />
-                    <Route path='/vendor-finance' element={<VendorFinance />} />
-                    <Route path='/vendor-notification' element={<Notification />} />
+                            <Route
+                                path="/dashboard"
+                                element={
+                                    <ProtectedRoute>
+                                    <Homepage />
+                                    </ProtectedRoute>
+                                }
+                                />  
+
+                                
+                            
+
+                                <Route
+                                    path="/vendor-service"
+                                    element={
+                                        <ProtectedRoute>
+                                            <VendorService />
+                                        </ProtectedRoute>
+                                    }
+                                />  
+                            {/* <Route 
+                                path="/vendor" 
+                                element={loggedIn ? <Homepage userDetails={userDetails} /> : <Navigate to="/signin" />} 
+                            />
+                            <Route 
+                                path="/vendor-service" 
+                                element={loggedIn ? <VendorService userDetails={userDetails} /> : <Navigate to="/signin" />} 
+                            /> */}
+
+                            <Route path='/addproducts' element={<AddProducts />} />
+                            <Route path='/vendors-orders' element={<VendorsOrders />} />
+                            <Route path='/vlogout' element={<VendorLogout />} />
+                            <Route path='/account' element={<Account />} />
+                            {/* <Route path='/vendor-service' element={<VendorService />} /> */}
+                            <Route path='/scanpoint' element={<ScanPoint />} />
+                            <Route path='/vendor-finance' element={<VendorFinance />} />
+                            <Route path='/vendor-notification' element={<Notification />} />
 
 
 
-                    {/* Admin dashboard */}  
-                    {loggedIn && (  
-                        <>  
-                            <Route path='/admin' element={<DashHome userDetails={userDetails} profileImage={profileImage} />} />  
-                            <Route path='/meals' element={<Meals userId={userDetails?.id} userDetails={userDetails} profileImage={profileImage}/>} />  
-                            <Route path='/orders' element={<Orders userDetails={userDetails} profileImage={profileImage}/>} />  
-                            <Route path='/sales' element={<Sales userId={userDetails?.id} userDetails={userDetails} profileImage={profileImage}/>} />  
-                            <Route path='/table' element={<Tables userId={userDetails?.id} userDetails={userDetails} profileImage={profileImage}/>} />  
-                            <Route path='/users' element={<Users userId={userDetails?.id} userDetails={userDetails} profileImage={profileImage}/>} />  
-                        </>  
-                    )}  
-                </Routes>       
-            </CartProvider>  
-        </div>  
+                            {/* Admin dashboard */}  
+                            {/* {loggedIn && (  
+                                <>  
+                                    <Route path='/admin' element={<DashHome userDetails={userDetails} profileImage={profileImage} />} />  
+                                    <Route path='/meals' element={<Meals userId={userDetails?.id} userDetails={userDetails} profileImage={profileImage}/>} />  
+                                    <Route path='/orders' element={<Orders userDetails={userDetails} profileImage={profileImage}/>} />  
+                                    <Route path='/sales' element={<Sales userId={userDetails?.id} userDetails={userDetails} profileImage={profileImage}/>} />  
+                                    <Route path='/table' element={<Tables userId={userDetails?.id} userDetails={userDetails} profileImage={profileImage}/>} />  
+                                    <Route path='/users' element={<Users userId={userDetails?.id} userDetails={userDetails} profileImage={profileImage}/>} />  
+                                </>  
+                            )}   */}
+                        </Routes>       
+                    </CartProvider>  
+                </div> 
+            </AuthProvider> 
+        </Provider>
     );  
 }  
 

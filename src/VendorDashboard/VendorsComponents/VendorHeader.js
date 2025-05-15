@@ -10,7 +10,7 @@ import { CiUser } from "react-icons/ci";
 import defaultDp from '../../Assets/Admin photo.png';
 
 const VendorHeader = ({ user }) => {
-  console.log("User in VendorHeader: ", JSON.stringify(user, null, 2));
+  // console.log("User in VendorHeader: ", JSON.stringify(user, null, 2));
 
 
     const profileRef = useRef(null);
@@ -40,8 +40,8 @@ const VendorHeader = ({ user }) => {
             <img src={defaultDp} alt="Admin Profile" className="profile-image" />
 
             <div>
-              <h5>{user?.fullname || 'User'}</h5> 
-              <p>{user?.role || 'Admin'}</p> {/* or email */}
+              <h5>{user.name || 'User'}</h5> 
+              <p>{user?.companyName || 'Admin'}</p> {/* or email */}
             </div>
             {isOpen ? <IoIosArrowUp className='h-i'/> : <IoIosArrowDown className='h-i'/>}
 

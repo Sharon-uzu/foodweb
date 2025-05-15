@@ -100,7 +100,7 @@ const AddProducts = () => {
             <div className="dash-home">
                 <div className="add-btns">
                     <div>
-                        <Link to='/vendor'>
+                        <Link to='/dashboard'>
                             <IoArrowBackOutline className='p-back'/>
                         </Link>
                         <h3>Products</h3>

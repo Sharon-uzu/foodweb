@@ -140,7 +140,7 @@ const VendorsOrders = () => {
 
             <div className="add-btns ord-btn">
                 <div>
-                    <Link to='/vendor'>
+                    <Link to='/dashboard'>
                         <IoArrowBackOutline className='p-back'/>
                     </Link>
                     <h3>Orders</h3>

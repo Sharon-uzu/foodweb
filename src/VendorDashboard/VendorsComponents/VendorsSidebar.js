@@ -49,7 +49,7 @@ const VendorsSidebar = () => {
                 <div className="category-sidebar dash-sidebar  vv-bar">
                     <div>
 
-                        <NavLink to='/vendor' className='links' activeclassName = 'active' onClick={closeMenuBar}>
+                        <NavLink to='/dashboard' className='links' activeclassName = 'active' onClick={closeMenuBar}>
                     
                             <div className='link'>
                                 <div>

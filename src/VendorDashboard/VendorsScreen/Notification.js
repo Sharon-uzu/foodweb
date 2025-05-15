@@ -15,7 +15,7 @@ const Notification = () => {
             <br />
             <div className="add-btns ord-btn">
                 <div>
-                    <Link to='/vendor'>
+                    <Link to='/dashboard'>
                         <IoArrowBackOutline className='p-back'/>
                     </Link>
                     <h3>Notification</h3>
