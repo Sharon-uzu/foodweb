@@ -1,6 +1,6 @@
-import React, { useState } from 'react';  
+import React, { useState, useRef, useEffect } from 'react';
 import VendorsSidebar from '../VendorsComponents/VendorsSidebar';  
-import { Link } from 'react-router-dom';  
+import { Link, useNavigate } from 'react-router-dom';  
 import { IoArrowBackOutline } from "react-icons/io5";  
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import VendorHeader from '../VendorsComponents/VendorHeader';  
@@ -13,6 +13,7 @@ import { FaArrowDownLong } from "react-icons/fa6";
 import { FaArrowUpLong } from "react-icons/fa6";
 import { LuBookCheck } from "react-icons/lu";
 import FinanceHistory from '../VendorsComponents/FinanceHistory';
+import Loader from '../VendorsComponents/Loader';
 
 const VendorFinance = () => {  
   const [isToggled, setIsToggled] = useState(false);  
@@ -30,6 +31,29 @@ const VendorFinance = () => {
   const handleGenerateFinance = () => {  
     setFinanceGenerated(true);  
   };  
+
+
+  const [userData, setUserData] = useState(null);
+    const navigate = useNavigate();
+  
+    useEffect(() => {
+      const storedUser = localStorage.getItem('userData');
+      if (storedUser) {
+        setUserData(JSON.parse(storedUser));
+      } else {
+        // Redirect to /signin if not authenticated
+        navigate('/signin');
+      }
+    }, [navigate]);
+  
+
+  const [loadingServices, setLoadingServices] = useState(false);
+
+
+      
+if (!userData || loadingServices) {
+    return <Loader />;
+  }
 
   return (  
     <div style={{ background: "#fcf9f8", overflowY:'scroll'}}>  

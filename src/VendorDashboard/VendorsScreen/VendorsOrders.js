@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import VendorsSidebar from '../VendorsComponents/VendorsSidebar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { IoArrowBackOutline } from "react-icons/io5";
 import img1 from '../../Assets/image 135.png'
 import { MdOutlineCancel } from "react-icons/md";
 import { FaRegEye } from "react-icons/fa";
+import Loader from '../VendorsComponents/Loader';
 
 const transactions = [
     {
@@ -105,6 +106,13 @@ const transactions = [
   
   const statusList = ['All', 'Pending', 'Shipping', 'Delivered', 'Cancelled'];
 
+  const handleStatusUpdate = (id, newStatus) => {
+    // Update status in your local transactions if you move to state
+    console.log(`Update transaction ${id} to ${newStatus}`);
+    // TODO: Make an API call or update state if transactions is dynamic
+  };
+  
+
 const VendorsOrders = () => {
 
 
@@ -130,6 +138,31 @@ const VendorsOrders = () => {
         const countByStatus = (status) => {
             return transactions.filter(tx => status === 'All' || tx.status === status).length;
         };
+
+        const [userData, setUserData] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('userData');
+    if (storedUser) {
+      setUserData(JSON.parse(storedUser));
+    } else {
+      // Redirect to /signin if not authenticated
+      navigate('/signin');
+    }
+  }, [navigate]);
+
+
+
+  const [loadingServices, setLoadingServices] = useState(false);
+
+
+      
+  if (!userData || loadingServices) {
+      return <Loader />;
+    }
+
+    
 
   return (
     <div style={{background:"#fcf9f8"}}>
@@ -172,8 +205,9 @@ const VendorsOrders = () => {
 
                     <div className="ord-table">
                         <table>
-                            <tr>
-                                <div className="r-rc">
+                          <div className="r-row">
+                            <tr className='r-rc'>
+                                
                                     <th>Orders</th>
                                     <th>Customer</th>
                                     <th>Price</th>
@@ -181,12 +215,14 @@ const VendorsOrders = () => {
                                     <th>Payment</th>
                                     <th>Status</th>
                                     <th>Action</th>
-                                </div>
-                            </tr>
+                                
+                              </tr>
+                            </div>
 
                             {paginatedTransactions.map((tx) => (
-                                <tr key={tx.id} className="r-row">
-                                    <div className="r-rc">
+                              <div className="r-row">
+
+                                <tr key={tx.id} className="r-rc">
                                         <td className="rd">
                                             <img src={tx.image} alt="" />
                                             <div>
@@ -198,11 +234,35 @@ const VendorsOrders = () => {
                                         <td className='pp'>{tx.amount}</td>
                                         <td className='pp'>{tx.date}</td>
                                         <td className='pp' style={{color:'#FF7700'}}>{tx.paymentType}</td>
-                                        <td className={`pp status ${tx.status.toLowerCase()}` } style={{ borderRadius: '5px', ...getStatusColor(tx.status) }}>{tx.status}</td>
-                                        <td className='pp pp1'><FaRegEye/></td>
-                                        <td className='pp pp1'><MdOutlineCancel/></td>
-                                    </div>
-                                </tr>
+                                        <td className={`pp status ${tx.status.toLowerCase()}`} style={{ borderRadius: '5px', ...getStatusColor(tx.status) }}>
+  {tx.status}
+</td>
+
+<td className='pp'>
+  {(tx.status !== 'Delivered' && tx.status !== 'Cancelled') ? (
+    <select
+      value={tx.status}
+      onChange={(e) => handleStatusUpdate(tx.id, e.target.value)}
+      style={{
+        padding: '4px 8px',
+        borderRadius: '5px',
+        border: '1px solid #ccc',
+        background: '#fff',
+        color: getStatusColor(tx.status).color
+      }}
+    >
+      <option value="Pending">Pending</option>
+      <option value="Shipping">Shipping</option>
+      <option value="Delivered">Delivered</option>
+      <option value="Cancelled">Cancelled</option>
+    </select>
+  ) : (
+    <span style={{ color: '#aaa' }}>No actions</span>
+  )}
+</td>
+
+                                  </tr>
+                                </div>
                                 ))}
                         </table>
 

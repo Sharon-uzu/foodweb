@@ -9,10 +9,27 @@ import { LuArrowUp } from "react-icons/lu";
 import { GoPlus } from "react-icons/go";
 import pro from '../../Assets/lucide_image.png'
 import VendorHeader from '../VendorsComponents/VendorHeader';
+import { useNavigate } from 'react-router-dom';
+import Loader from '../VendorsComponents/Loader';
 
 
 const AddProducts = () => {
 
+
+    const [userData, setUserData] = useState(null);
+    const navigate = useNavigate();
+  
+    useEffect(() => {
+      const storedUser = localStorage.getItem('userData');
+      if (storedUser) {
+        setUserData(JSON.parse(storedUser));
+      } else {
+        // Redirect to /signin if not authenticated
+        navigate('/signin');
+      }
+    }, [navigate]);
+  
+  
 
         const products = [
             {
@@ -88,7 +105,39 @@ const AddProducts = () => {
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
 
-          
+    const [loadingServices, setLoadingServices] = useState(false);
+
+    const [activeMenuId, setActiveMenuId] = useState(null);
+
+    const toggleMenu = (productId) => {
+      setActiveMenuId(prevId => (prevId === productId ? null : productId));
+    };
+    
+    const closeMenu = () => {
+      setActiveMenuId(null);
+    };
+
+    const menuRef = useRef();
+
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (menuRef.current && !menuRef.current.contains(event.target)) {
+      closeMenu();
+    }
+  };
+
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, []);
+
+
+
+      
+if (!userData || loadingServices) {
+    return <Loader />;
+  }
 
   return (
     <div style={{background:"#fcf9f8"}}>
@@ -121,7 +170,20 @@ const AddProducts = () => {
                             <div className="pp-txt">
                                 <div className="p-name">
                                 <h4>{product.name}</h4>
-                                <HiDotsHorizontal className='ppp-i'/>
+                                <div className="dots-menu-container" style={{ position: 'relative' }} onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    toggleMenu(product.id); 
+                                  }}>
+                                  <HiDotsHorizontal className='ppp-i' style={{cursor:"pointer"}}/>
+
+                                  {activeMenuId === product.id && (
+                                    <div className="product-action-menu" ref={menuRef}>
+                                      <button onClick={() => alert(`Edit ${product.name}`)}>Edit</button>
+                                      <button onClick={() => alert(`Delete ${product.name}`)} className="danger">Delete</button>
+                                    </div>
+                                  )}
+                                </div>
+
                                 </div>
                                 <h3>N{product.price.toLocaleString()}</h3>
                                 <div className="bonus">

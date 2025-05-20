@@ -14,6 +14,7 @@ import { FaRegEye } from "react-icons/fa";
 import img1 from '../../Assets/image 135.png'
 import DashGraphs from '../VendorsComponents/DashGraphs';
 import VendorHeader from '../VendorsComponents/VendorHeader';
+import Loader from '../VendorsComponents/Loader';
 
 const reviewsData = [  
   {  
@@ -155,8 +156,12 @@ const Homepage = ({user}) => {
     }
   }, [navigate]);
 
-  if (!userData) return <p>Loading user data...</p>;
+  const [loadingServices, setLoadingServices] = useState(false);
 
+
+  if (!userData || loadingServices) {
+    return <Loader />;
+  }
 
   return (
     <div style={{background:"#fcf9f8"}}>

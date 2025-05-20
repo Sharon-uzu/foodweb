@@ -31,7 +31,7 @@ const VendorHeader = ({ user }) => {
     <header className='adminheader vendorheader'>
       <nav>
         <ul>          
-          <Link to='/' className='h-group'>
+          <Link to='/vendor-notification' className='h-group'>
             <FaRegBell className='h-i' style={{color: '#FF7700'}}/>
           </Link>
 

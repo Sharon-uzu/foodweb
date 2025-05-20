@@ -17,123 +17,36 @@ import { useNavigate } from 'react-router-dom';
 import { useCreateServiceMutation } from '../../redux-state/api/apiSlice'; // adjust path as needed
 import { useGetServicesQuery } from '../../redux-state/api/apiSlice';
 import AuthService from '../../services/AuthService';
-
-
-const productItems = [
-    {
-      id: 1,
-      image: img2,
-      number: 'TXN123456',
-      food:'Ice cream',
-      name: 'John Doe',
-      amount: '$120.00',
-      date: '2025-04-10',
-    
-    },
-    {
-      id: 2,
-      image: img2,
-      number: 'TXN123457',
-      food:'Rice',
-      name: 'Jane Smith',
-      amount: '$85.50',
-      date: '2025-04-11',
-     
-    },
-    {
-      id: 3,
-      image: img2,
-      number: 'TXN123458',
-      food:'Burger',
-      name: 'Alice Johnson',
-      amount: '$49.99',
-      date: '2025-04-12',
-   
-    },
-    {
-        id: 4,
-        image: img2,
-        number: 'TXN123457',
-        food:'Rice',
-        name: 'Jane Smith',
-        amount: '$85.50',
-        date: '2025-04-11',
-       
-      },
-      {
-        id: 5,
-        image: img2,
-        number: 'TXN123458',
-        food:'Burger',
-        name: 'Alice Johnson',
-        amount: '$49.99',
-        date: '2025-04-12',
-      
-      },
-      {
-        id: 6,
-        image: img2,
-        number: 'TXN123456',
-        food:'Ice cream',
-        name: 'John Doe',
-        amount: '$120.00',
-        date: '2025-04-10',
-       
-      },
-      {
-        id: 7,
-        image: img2,
-        number: 'TXN123457',
-        food:'Rice',
-        name: 'Jane Smith',
-        amount: '$85.50',
-        date: '2025-04-11',
-       
-      },
-  ];
-
-
-  
-
-
-const VendorService = ({user, userId}) => {
-
-
-    // items
-    const [activeStatus, setActiveStatus] = useState('All');
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
-
-    const handleStatusChange = (status) => {
-        setActiveStatus(status);
-        setCurrentPage(1); // reset to first page on filter change
-    };
-
-    const filteredProducts = activeStatus === 'All'
-        ? productItems
-        : productItems.filter(tx => tx.status === activeStatus);
-
-    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-    const paginatedProducts = filteredProducts.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
-
-    const countByStatus = (status) => {
-        return productItems.filter(tx => status === 'All' || tx.status === status).length;
-    };
+import { MdDelete } from "react-icons/md";
+import Loader from '../VendorsComponents/Loader';
 
 
 
+
+const VendorService = ({user, userId}) => {    
+ 
 
   const [isToggled, setIsToggled] = useState(false);
   const handleToggle = () => setIsToggled(!isToggled);
-
+  const [deleteSuccessMessage, setDeleteSuccessMessage] = useState('');
+  const [showDeleteSuccessModal, setShowDeleteSuccessModal] = useState(false);
+  
 
   const [serviceGenerated, setServiceGenerated] = useState(false);
   const handleGenerateService = () => setServiceGenerated(true);
-  const handleDegenerateService = () => setServiceGenerated(false);
-
+  
+  const handleDegenerateService = () => {
+    setServiceGenerated(false);
+  
+    if (userServices.length > 0) {
+      // Show existing services
+      setServiceFinalized(true);
+    } else {
+      // No services, show empty state
+      setServiceFinalized(false);
+    }
+  };
+  
   const [showModal, setShowModal] = useState(false);
   const [serviceFinalized, setServiceFinalized] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
@@ -205,6 +118,13 @@ const [userData, setUserData] = useState(null);
 const [userServices, setUserServices] = useState([]);
 
 const [loadingServices, setLoadingServices] = useState(false);
+
+
+const [openMenuServiceId, setOpenMenuServiceId] = useState(null);
+const toggleDropdown = (serviceId) => {
+  setOpenMenuServiceId(prev => (prev === serviceId ? null : serviceId));
+};
+
 
 const fetchUserServices = async () => {
   try {
@@ -282,29 +202,163 @@ const handleSubmitItem = async (e) => {
 
 
 
+  const [selectedServiceItems, setSelectedServiceItems] = useState([]);
+
+  const handleViewService = async (serviceId) => {
+    try {
+      const items = await AuthService.getServiceItemsByServiceId(serviceId);
+      const service = userServices.find(s => s.id === serviceId);
+  
+      if (!items || items.length === 0) {
+        // No items: trigger item modal directly
+        setCurrentService(service);
+        setShowAddItemModal(true);
+      } else {
+        // Has items: show detail view
+        setSelectedServiceItems(items);
+        setSelectedService(service);
+      }
+  
+    } catch (error) {
+      console.error(error.message);
+      alert("Failed to fetch service items. Check console for details.");
+    }
+  };
+  
+  
+  const [currentItemPage, setCurrentItemPage] = useState(1);
+  const itemsPerPage = 5;
+  const totalItemPages = Math.ceil(selectedServiceItems.length / itemsPerPage);
+
+const paginatedItems = selectedServiceItems.slice(
+  (currentItemPage - 1) * itemsPerPage,
+  currentItemPage * itemsPerPage
+);
+
+  const [deletingServiceId, setDeletingServiceId] = useState(null);
+
+const handleDeleteService = async (serviceId) => {
+  const confirmDelete = window.confirm('Are you sure you want to delete this service?');
+  if (!confirmDelete) return;
+
+  setDeletingServiceId(serviceId);
+  try {
+    await AuthService.deleteService(serviceId);
+    await fetchUserServices();
+    setDeleteSuccessMessage('Service deleted successfully.');
+    setShowDeleteSuccessModal(true);
+      } catch (error) {
+    console.error('Error deleting scan point:', error);
+    alert(`Failed to delete: ${error.message}`);
+  } finally {
+    setDeletingServiceId(null);
+  }
+};
+
+ useEffect(() => {
+    const storedUser = localStorage.getItem('userData');
+    const token = localStorage.getItem('token');
+    
+    if (storedUser && token) {
+      setUserData(JSON.parse(storedUser));
+    } else {
+      navigate('/signin');
+    }
+  }, [navigate]);
+
+const deleteService = async (serviceId) => {
+  const token = localStorage.getItem('token');
+
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("Authorization", `Bearer ${token}`);
+
+  const raw = JSON.stringify({
+    "serviceId": serviceId
+  });  
+
+  const requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: raw,
+    redirect: 'follow'
+  };
+
+  try {
+    const response = await fetch('https://scanorder-server.vercel.app/api/v1/user/delete-service', requestOptions);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText);
+    }
+    const result = await response.text();
+    console.log(result);
+    await fetchUserServices();
+    alert('Service deleted successfully.');
+  } catch (error) {
+    console.error('Error deleting service:', error);
+    alert(`Failed to delete: ${error.message}`);
+  }
+};
+
+
+const handleDeleteItem = async (serviceId, itemId) => {
+  const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+  if (!confirmDelete) return;
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("You must be logged in.");
+    return;
+  }
+
+  try {
+    const response = await fetch('https://scanorder-server.vercel.app/api/v1/user/delete-service-item', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ serviceId, itemId })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error);
+    }
+
+    handleViewService(serviceId);
+    setDeleteSuccessMessage('Item deleted successfully!');
+    setShowDeleteSuccessModal(true);
+
+  } catch (error) {
+    console.error("Delete item failed:", error);
+    alert("Failed to delete item.");
+  }
+};
+
+
+
+useEffect(() => {
+  if (showDeleteSuccessModal) {
+    const timer = setTimeout(() => {
+      setShowDeleteSuccessModal(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }
+}, [showDeleteSuccessModal]);
+
+
 
   
-  if (!userData) return <p>Loading user data...</p>;
+if (!userData || loadingServices) {
+  return <Loader />;
+}
 
-  // console.log(userData);
   
   return (
     <div style={{ background: "#fcf9f8" }}>
       
-      {/* {user && user.service && user.service.length > 0 ? (
-        <ul>
-          {user.service.map((serviceItem) => (
-            <li key={serviceItem.id}>
-              <p><strong>Description:</strong> {serviceItem.description}</p>
-              <p><strong>Has Paid Items:</strong> {serviceItem.hasPaidItems ? "Yes" : "No"}</p>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No services available.</p>
-      )} */}
-
-
+    
 
       <VendorHeader user={userData.user}/>
 
@@ -329,9 +383,9 @@ const handleSubmitItem = async (e) => {
               <div className="scan-form">
                 <div className="add-btns">
                   <div>
-                    <Link to='/dashboard'>
+                    {/* <Link to='/dashboard'>
                       <IoArrowBackOutline className='p-back' />
-                    </Link>
+                    </Link> */}
                     <h3>Service</h3>
                   </div>
                 </div>
@@ -423,66 +477,41 @@ const handleSubmitItem = async (e) => {
                 
                 {userServices.length > 0 ? (
                   userServices.map((service) => (
-                    <div className='product-card service-card' key={service.id} style={{cursor:'pointer'}} onClick={() => {
-                      setCurrentService(service);   // This sets the current service
-                      setShowAddItemModal(true);   // This opens the modal
-                    }}>
-                      {/* All usage of 'service' here */}
+               
+                    <div className='product-card service-card' key={service.id}>
                       <div className="product1">
-                        <div className="pp1-c">
-                            <div className="pp-top">
-                            <img src={img} alt={service.service} />
-                            <div className="pp-txt">
-                                <div className="p-name">
-                                <h4>{service.service}</h4>
-                                <HiDotsHorizontal className='ppp-i'/>
-                                </div>
-                                {/* <h3>N{service.price.toLocaleString()}</h3> */}
-                                <div className="bonus">
-                                {/* <p>N{service.oldPrice.toLocaleString()}</p> */}
-                                <h6>{service.discount}</h6>
-                                </div>
-                            </div>
-                            </div>
+                        <div className="p-top" style={{display:'flex', justifyContent:'space-between', marginBottom:'10px'}}>
+                          <h3>{service.service}</h3>
+                          <div className="dots-menu" style={{cursor:'pointer', position:'relative'}}>
+                            <HiDotsHorizontal onClick={() => toggleDropdown(service.id)} className="menu-icon" />
 
-                            <div className="row1">
-                                <div className="row1-c">
-                                    <p>{service.description}</p>
+                            {openMenuServiceId === service.id && (
+                              <div className="dropdown-menu">
+                                <div
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => handleViewService(service.id)}  
+                              >
+                                <FaRegEye />
+                              </div>
+                               <div
+                                  className="dropdown-item"
+                                  onClick={() => {
+                                    deleteService(service.id);
+                                    // setOpenMenuServiceId(null); 
+                                  }}
+                                >
+                                  <MdDelete/>
                                 </div>
-                            </div>
-
-                            <div className="row1">
-                            <div className="row1-c">
-                                <p>No. of sales</p>
-                                <div>
-                                <LuArrowUp className='rr-i'/>
-                                <p>{service.sales}</p>
-                                </div>
-                            </div>
-                            </div>
-
-                            <div className="row1">
-                            <div className="row1-c">
-                                <p>reamining product</p>
-                                <div>
-                                <div className="prog">
-                                    <span></span>
-                                </div>
-                                <p>{service.remaining}</p>
-                                </div>
-                            </div>
-                            </div>
-
-                            <div className="row1">
-                            <div className="row1-c">
-                                <p>Review</p>
-                                <p>{service.rating}</p>
-                            </div>
-                            </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        </div>
-                      
+                        <p>{service.description}</p>
+                      </div>
                     </div>
+
+
+
                   ))
                 ) : (
                   'No services'
@@ -490,6 +519,8 @@ const handleSubmitItem = async (e) => {
                 </div>
               </div>
             )}
+
+
 
             {/* SHOW DETAIL */}
             {selectedService && (
@@ -510,50 +541,58 @@ const handleSubmitItem = async (e) => {
                 <br />
                 <div className="ord-table">
                         <table>
-                            <tr>
-                                <div className="r-rc">
-                                    <th>Orders</th>
-                                    <th>Customer</th>
-                                    <th>Price</th>
-                                    <th>Date</th>
-                                    <th>Action</th>
-                                </div>
-                            </tr>
+                            <div className="r-row">
 
-                            {paginatedProducts.map((tx) => (
-                                <tr key={tx.id} className="r-row">
-                                    <div className="r-rc">
+                              <tr className="r-rc">
+                                    <th>Item</th>
+                                    <th>Description</th>
+                                    <th>Price</th>
+                                    <th>Category</th>
+                                    <th>Action</th>
+                              </tr>
+                            </div>
+
+
+                            {paginatedItems.map(item => (
+                                <div className="r-row">
+
+                                  <tr key={item.id} className="r-rc">
                                         <td className="rd">
-                                            <img src={tx.image} alt="" />
+                                            <img src={img} alt="" />
                                             <div>
-                                                <h4>{tx.number}</h4>
-                                                <p>{tx.food}</p>
+                                                <h4>{item.item}</h4>
+                                                {/* <p>{item.item}</p> */}
                                             </div>
                                         </td>
-                                        <td className='pp'>{tx.name}</td>
-                                        <td className='pp'>{tx.amount}</td>
-                                        <td className='pp'>{tx.date}</td>
+                                        <td className='pp'>{item.description}</td>
+                                        <td className='pp'>{item.amount}</td>
+                                        <td className='pp'>{item.category}</td>
                                         <td className='pp'>
-                                            <FaRegEye className='tp-i'/>
-                                            <MdOutlineCancel className='tp-i'/>
+                                            <div
+                                              className="delete-btn" style={{cursor:'pointer'}}
+                                              onClick={() => handleDeleteItem(selectedService?.id, item.id)}
+                                            >
+                                              <MdDelete />
+                                            </div>
                                         </td>
                                         {/* <td className='pp pp1'></td> */}
-                                    </div>
-                                </tr>
+                                    
+                                  </tr>
+                                </div>
                                 ))}
                         </table>
 
                         {/* Pagination */}
                         <div style={{ marginTop: '1rem', display: 'flex', gap: '8px' }}>
-                            {Array.from({ length: totalPages }, (_, i) => (
+                            {Array.from({ length: totalItemPages}, (_, i) => (
                             <button
                                 key={i}
-                                onClick={() => setCurrentPage(i + 1)}
+                                onClick={() => setCurrentItemPage(i + 1)}
                                 style={{
                                 padding: '6px 12px',
                                 borderRadius: '6px',
-                                background: currentPage === i + 1 ? '#FF7700' : '#eee',
-                                color: currentPage === i + 1 ? '#fff' : '#000',
+                                background: currentItemPage === i + 1 ? '#FF7700' : '#eee',
+                                color: currentItemPage === i + 1 ? '#fff' : '#000',
                                 border: 'none',
                                 cursor: 'pointer'
                                 }}
@@ -582,21 +621,21 @@ const handleSubmitItem = async (e) => {
                         <img src={pro} alt="" />
                         <div>
                           <GoPlus className='plus' />
-                          <p>Add product image</p>
+                          <p>Add Item image</p>
                         </div>
                       </div>
                     </div>
 
                     <input
                       type="text"
-                      placeholder="Product Category"
+                      placeholder="Item Category"
                       value={itemData.category}
                       onChange={(e) => setItemData({ ...itemData, category: e.target.value })}
                     />
 
                     <input
                       type="text"
-                      placeholder="Product Name"
+                      placeholder="Item Name"
                       value={itemData.item}
                       onChange={(e) => setItemData({ ...itemData, item: e.target.value })}
                     />
@@ -633,6 +672,19 @@ const handleSubmitItem = async (e) => {
               </div>
             )}
 
+            {showDeleteSuccessModal && (
+              <div className="modal-overlay scan-modal">
+                <div className="modal-content">
+                  <div className="m-close">
+                    <h3 onClick={() => setShowDeleteSuccessModal(false)}>
+                      <IoCloseSharp />
+                    </h3>
+                  </div>
+                  <img className='mark-img' src={img1} alt="success" />
+                  <p>{deleteSuccessMessage}</p>
+                </div>
+              </div>
+            )}
 
 
           </div>

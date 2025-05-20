@@ -4,18 +4,41 @@ import { Link } from 'react-router-dom';
 import { IoArrowBackOutline } from "react-icons/io5";
 import { LuPencilLine } from "react-icons/lu";
 import VendorHeader from '../VendorsComponents/VendorHeader';
+import Loader from '../VendorsComponents/Loader';
+import { useNavigate } from 'react-router-dom';
 
 const Account = () => {
 
+    const [userData, setUserData] = useState(null);
+  const navigate = useNavigate();
+
+    const [loadingServices, setLoadingServices] = useState(false);
+
+
         const [isEditing, setIsEditing] = useState(false);
-        const [formData, setFormData] = useState({
-        firstName: 'Emeka',
-        lastName: 'Prince',
-        email: 'emeka@gmail.com',
-        password: '*****',
-        });
+        const [formData, setFormData] = useState(null);
 
 
+
+        useEffect(() => {
+          const storedUser = localStorage.getItem('userData');
+          if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            setUserData(parsedUser);
+            const fullName = parsedUser.user.name || '';
+            const [firstName, lastName = ''] = fullName.split(' '); // safely handle names
+            setFormData({
+              fullName: parsedUser.user.name || '',
+              companyName:parsedUser.user.companyName || '',
+              email: parsedUser.user.email || '',
+              phone: parsedUser.user.phone || '',
+              // password: '*****',
+            });
+          } else {
+            navigate('/signin');
+          }
+        }, [navigate]);
+        
 
         const handleEditClick = () => {
             setIsEditing(true);
@@ -35,7 +58,9 @@ const Account = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
         };
 
-
+        if (!userData || loadingServices) {
+            return <Loader />;
+          }
 
   return (
     <div style={{background:"#fcf9f8"}}>
@@ -78,23 +103,23 @@ const Account = () => {
 
                 <form className='account-form'>
                     <label>
-                    <p>First Name</p>
+                    <p>Full Name</p>
                     <input
                         type="text"
                         name="firstName"
-                        value={formData.firstName}
+                        value={formData.fullName}
                         onChange={handleInputChange}
-                        readOnly={!isEditing}
+                        readOnly
                     />
                     </label>
                     <label>
-                    <p>Last Name</p>
+                    <p>Company Name</p>
                     <input
                         type="text"
                         name="lastName"
-                        value={formData.lastName}
+                        value={formData.companyName}
                         onChange={handleInputChange}
-                        readOnly={!isEditing}
+                        readOnly
                     />
                     </label>
                     <label>
@@ -109,13 +134,13 @@ const Account = () => {
 
                     </label>
                     <label>
-                    <p>Password</p>
+                    <p>Phone</p>
                     <input
                         type="text"
-                        name="password"
-                        value={formData.password}
+                        name="phone"
+                        value={formData.phone}
                         onChange={handleInputChange}
-                        readOnly={!isEditing}
+                        readOnly
                     />
                     </label>
 
